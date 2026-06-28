@@ -12,11 +12,23 @@ createRoot(rootEl).render(
   </StrictMode>
 );
 
-// Register the service worker for PWA app-shell caching.
+// Service worker: register ONLY in production builds. In dev (Vite, HMR) a
+// cached app shell would serve stale assets and break hot reload, so we skip
+// registration and proactively tear down any SW/caches left over from a
+// previously-installed dev build.
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch((err) => {
-      console.warn("SW registration failed", err);
+  if (import.meta.env.PROD) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js").catch((err) => {
+        console.warn("SW registration failed", err);
+      });
     });
-  });
+  } else {
+    void navigator.serviceWorker
+      .getRegistrations()
+      .then((regs) => regs.forEach((r) => void r.unregister()));
+    if (typeof caches !== "undefined") {
+      void caches.keys().then((keys) => keys.forEach((k) => void caches.delete(k)));
+    }
+  }
 }

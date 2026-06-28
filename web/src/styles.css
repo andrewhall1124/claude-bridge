@@ -330,6 +330,52 @@ select:focus {
   color: var(--danger);
 }
 
+/* ---------- chat mode bar & permission-mode badge ---------- */
+.chat-modebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-1);
+}
+.mode-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg-3);
+  color: var(--text-dim);
+  flex: 0 0 auto;
+  letter-spacing: 0.02em;
+}
+.mode-badge.mode-default {
+  background: var(--bg-3);
+  color: var(--text-dim);
+}
+.mode-badge.mode-acceptEdits {
+  background: #14324a;
+  color: #67c0ff;
+}
+.mode-badge.mode-plan {
+  background: #1f2b1f;
+  color: var(--ok);
+}
+.mode-badge.mode-bypassPermissions {
+  background: #3a1620;
+  color: #fff;
+  border: 1px solid var(--danger);
+  box-shadow: 0 0 0 1px var(--danger) inset;
+}
+.mode-select {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mode-select select {
+  max-width: 230px;
+}
+
 /* ---------- panes ---------- */
 .pane {
   flex: 1;

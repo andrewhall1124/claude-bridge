@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { api } from "./api";
 import { ws } from "./ws";
 import { useConnState, useSessionStream } from "./hooks";
-import type { AnyServerEvent, Repo, SessionMeta } from "./protocol";
+import type { AnyServerEvent, PermissionMode, Repo, SessionMeta } from "./protocol";
 import { Sidebar } from "./components/Sidebar";
 import { ChatPane } from "./components/ChatPane";
 import { Activity } from "./components/Activity";
@@ -43,7 +43,6 @@ export function App() {
   );
   const [tab, setTab] = useState<Tab>("chat");
   const [creating, setCreating] = useState(false);
-  const [autoApprove, setAutoApprove] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const conn = useConnState();
@@ -110,11 +109,8 @@ export function App() {
     }
   }
 
-  function toggleAutoApprove(on: boolean) {
-    setAutoApprove(on);
-    if (selectedSessionId) {
-      ws.setPermissionMode(selectedSessionId, on ? "acceptEdits" : "default");
-    }
+  function setMode(mode: PermissionMode) {
+    if (selectedSessionId) ws.setPermissionMode(selectedSessionId, mode);
   }
 
   const connLabel =
@@ -133,8 +129,7 @@ export function App() {
           <ChatPane
             session={selectedSession}
             stream={stream}
-            autoApprove={autoApprove}
-            onToggleAutoApprove={toggleAutoApprove}
+            onSetMode={setMode}
           />
         );
       case "activity":

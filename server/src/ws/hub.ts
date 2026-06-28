@@ -31,6 +31,7 @@ export function attachWebSocket(server: Server): WebSocketServer {
         type: "hello",
         sessionId,
         status: meta?.status ?? "idle",
+        mode: meta?.permissionMode ?? "default",
       });
     };
 

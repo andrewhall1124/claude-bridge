@@ -67,7 +67,8 @@ async function runOne(jobId: string): Promise<void> {
 
   // Each job gets a session so its transcript & live stream reuse the normal
   // session machinery (viewable + watchable from the UI).
-  const session = dbm.createSession(repo.id, `Job: ${summarize(job.prompt)}`);
+  // Jobs always run with auto-approval; reflect that in the session record.
+  const session = dbm.createSession(repo.id, `Job: ${summarize(job.prompt)}`, "acceptEdits");
   dbm.setSessionStatus(session.id, "running");
   dbm.updateJob(jobId, { status: "running", sessionId: session.id });
   emitGlobal({ type: "jobs_changed" });

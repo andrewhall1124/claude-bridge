@@ -1,23 +1,35 @@
 import { useEffect, useRef, useState } from "react";
 import { ws } from "../ws";
-import type { SessionMeta } from "../protocol";
+import type { PermissionMode, SessionMeta } from "../protocol";
 import type { SessionStream } from "../hooks";
 import { Approval } from "./Approval";
 import { MessageItem } from "./MessageItem";
 import { RichText } from "./RichText";
 
+const MODE_OPTIONS: { value: PermissionMode; label: string }[] = [
+  { value: "default", label: "default — ask before edits/commands" },
+  { value: "acceptEdits", label: "acceptEdits — auto-approve file edits" },
+  { value: "plan", label: "plan — explore only, no changes" },
+  { value: "bypassPermissions", label: "bypass — run everything unprompted ⚠" },
+];
+
+const MODE_BADGE: Record<PermissionMode, string> = {
+  default: "default",
+  acceptEdits: "accept edits",
+  plan: "plan",
+  bypassPermissions: "BYPASS ⚠",
+};
+
 interface Props {
   session: SessionMeta | null;
   stream: SessionStream;
-  autoApprove: boolean;
-  onToggleAutoApprove: (on: boolean) => void;
+  onSetMode: (mode: PermissionMode) => void;
 }
 
 export function ChatPane({
   session,
   stream,
-  autoApprove,
-  onToggleAutoApprove,
+  onSetMode,
 }: Props) {
   const [text, setText] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -37,6 +49,7 @@ export function ChatPane({
   }
 
   const running = stream.status === "running";
+  const mode: PermissionMode = stream.permissionMode ?? session.permissionMode;
 
   function send() {
     const t = text.trim();
@@ -54,6 +67,14 @@ export function ChatPane({
 
   return (
     <div className="pane chat-pane">
+      <div className="chat-modebar">
+        <span className="subtle">{session.title || "session"}</span>
+        <span className="spacer" />
+        <span className={`mode-badge mode-${mode}`} title={`Permission mode: ${mode}`}>
+          {MODE_BADGE[mode]}
+        </span>
+        <span className={`status-badge status-${stream.status}`}>{stream.status}</span>
+      </div>
       <div className="chat-scroll" ref={scrollRef}>
         {stream.loading && <div className="subtle">Loading transcript…</div>}
         {!stream.loading && stream.transcript.length === 0 && (
@@ -87,13 +108,18 @@ export function ChatPane({
 
       <div className="chat-input">
         <div className="chat-input-controls">
-          <label className="toggle">
-            <input
-              type="checkbox"
-              checked={autoApprove}
-              onChange={(e) => onToggleAutoApprove(e.target.checked)}
-            />
-            Auto-approve edits
+          <label className="mode-select">
+            <span className="subtle">Mode</span>
+            <select
+              value={mode}
+              onChange={(e) => onSetMode(e.target.value as PermissionMode)}
+            >
+              {MODE_OPTIONS.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
           </label>
           {running && (
             <button

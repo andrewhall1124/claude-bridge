@@ -3,6 +3,7 @@ import { api } from "./api";
 import { ws, type ConnState } from "./ws";
 import type {
   AnyServerEvent,
+  PermissionMode,
   ResultContent,
   SessionStatus,
   TranscriptItem,
@@ -33,6 +34,7 @@ export interface SessionStream {
   streamingText: string;
   streaming: boolean;
   status: SessionStatus;
+  permissionMode: PermissionMode | null;
   approvals: PendingApproval[];
   activity: ActivityEntry[];
   lastResult: ResultContent | null;
@@ -45,6 +47,7 @@ const EMPTY: SessionStream = {
   streamingText: "",
   streaming: false,
   status: "idle",
+  permissionMode: null,
   approvals: [],
   activity: [],
   lastResult: null,
@@ -72,6 +75,7 @@ export function useSessionStream(sessionId: string | null): SessionStream {
           ...prev,
           transcript: res.transcript,
           status: res.session.status,
+          permissionMode: res.session.permissionMode,
           loading: false,
         }));
       })
@@ -90,7 +94,10 @@ export function useSessionStream(sessionId: string | null): SessionStream {
       if (!("sessionId" in ev) || ev.sessionId !== sessionId) return;
       switch (ev.type) {
         case "hello":
-          setState((p) => ({ ...p, status: ev.status }));
+          setState((p) => ({ ...p, status: ev.status, permissionMode: ev.mode }));
+          break;
+        case "permission_mode":
+          setState((p) => ({ ...p, permissionMode: ev.mode }));
           break;
         case "delta":
           if (ev.blockType === "text") {

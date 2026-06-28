@@ -51,16 +51,20 @@ export async function buildServer(): Promise<FastifyInstance> {
   // Sessions
   app.get("/api/sessions", async () => ({ sessions: dbm.listSessions() }));
 
-  app.post<{ Body: { repoId?: string; title?: string } }>(
-    "/api/sessions",
-    async (req, reply) => {
-      const { repoId, title } = req.body ?? {};
-      if (!repoId) return reply.code(400).send({ error: "repoId is required" });
-      requireRepo(repoId);
-      const session = dbm.createSession(repoId, title?.trim() || "New session");
-      return { session };
-    },
-  );
+  app.post<{
+    Body: { repoId?: string; title?: string; permissionMode?: PermissionMode };
+  }>("/api/sessions", async (req, reply) => {
+    const { repoId, title, permissionMode } = req.body ?? {};
+    if (!repoId) return reply.code(400).send({ error: "repoId is required" });
+    requireRepo(repoId);
+    const mode =
+      permissionMode &&
+      ["default", "acceptEdits", "plan", "bypassPermissions"].includes(permissionMode)
+        ? permissionMode
+        : undefined;
+    const session = dbm.createSession(repoId, title?.trim() || "New session", mode);
+    return { session };
+  });
 
   app.get<{ Params: { id: string } }>("/api/sessions/:id", async (req, reply) => {
     const session = dbm.getSession(req.params.id);

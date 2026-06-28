@@ -211,7 +211,7 @@ function startSession(sessionId: string): ActiveSession {
   const settings = dbm.getSettings();
   const input = new AsyncQueue<SDKUserMessage>();
   const pending = new Map<string, PendingApproval>();
-  const permissionMode = settings.defaultPermissionMode;
+  const permissionMode = meta.permissionMode ?? settings.defaultPermissionMode;
 
   const getSelf = () => active.get(sessionId);
 
@@ -219,11 +219,12 @@ function startSession(sessionId: string): ActiveSession {
     cwd: repo.path,
     model: settings.defaultModel,
     permissionMode: sdkPermissionMode(permissionMode),
-    // The SDK requires this opt-in before bypassPermissions can ever take
-    // effect. We only enable it when the session actually starts in bypass
-    // mode (chosen deliberately in Settings), so it can't silently widen
-    // privilege on a normal session.
-    allowDangerouslySkipPermissions: permissionMode === "bypassPermissions",
+    // The SDK requires this opt-in before bypassPermissions can take effect.
+    // We enable it for chat sessions so the owner can switch a live session
+    // into bypass from the UI. It is only a *precondition* — it never bypasses
+    // anything on its own; bypass happens solely when permissionMode is
+    // 'bypassPermissions', which is an explicit, clearly-warned choice.
+    allowDangerouslySkipPermissions: true,
     includePartialMessages: true,
     canUseTool: buildCanUseTool(sessionId, getSelf),
     env: agentEnv(),
@@ -309,14 +310,19 @@ export async function setPermissionMode(
   sessionId: string,
   mode: PermissionMode,
 ): Promise<void> {
+  // Persist so it survives restarts and is reported to clients even before the
+  // agent (re)starts.
+  dbm.setSessionMode(sessionId, mode);
   const sess = active.get(sessionId);
-  if (!sess) return;
-  sess.permissionMode = mode;
-  try {
-    await sess.query.setPermissionMode(sdkPermissionMode(mode) as PermissionMode);
-  } catch (err) {
-    log.warn(`setPermissionMode failed for ${sessionId}:`, err);
+  if (sess) {
+    sess.permissionMode = mode;
+    try {
+      await sess.query.setPermissionMode(sdkPermissionMode(mode) as PermissionMode);
+    } catch (err) {
+      log.warn(`setPermissionMode failed for ${sessionId}:`, err);
+    }
   }
+  emitSession(sessionId, { type: "permission_mode", sessionId, mode });
 }
 
 export function isActive(sessionId: string): boolean {

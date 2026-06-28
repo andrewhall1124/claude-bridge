@@ -218,8 +218,11 @@ in the Settings tab (stored in SQLite, seeded from config on first boot).
   clients and appended to the SQLite transcript as it arrives.
 - **Permissions:** chat sessions pass a `canUseTool` approval callback. When Claude wants
   to write/edit/run, the server emits an `approval_request` over the WebSocket and waits;
-  the client shows Approve/Reject. The per-session "auto-approve edits" toggle switches
-  `permissionMode` to `acceptEdits`.
+  the client shows Approve/Reject. Each session has a **permission-mode selector** in the
+  chat header (and a live badge showing the current mode) — `default`, `acceptEdits`,
+  `plan`, or `bypassPermissions`. Changing it applies to the running session immediately
+  and is reported back over the WebSocket, so you can always see (and confirm) which mode
+  is in effect. In `bypassPermissions` no approval prompts appear and tools run unprompted.
 - **Jobs** run unattended with auto-approval so they never block, recording a transcript,
   a short result summary, and the list of changed files.
 - **Code & diff:** all repo file/diff/commit/discard operations are scoped to the repo

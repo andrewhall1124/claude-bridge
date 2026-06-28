@@ -18,6 +18,7 @@ export interface SessionMeta {
   repoId: string;
   title: string;
   status: SessionStatus;
+  permissionMode: PermissionMode;
   createdAt: string;
   lastActiveAt: string;
 }
@@ -64,7 +65,8 @@ export interface TranscriptItem {
 
 // ---- WebSocket: server -> client ----
 export type ServerEvent =
-  | { type: "hello"; sessionId: string; status: SessionStatus }
+  | { type: "hello"; sessionId: string; status: SessionStatus; mode: PermissionMode }
+  | { type: "permission_mode"; sessionId: string; mode: PermissionMode }
   | { type: "message"; sessionId: string; item: TranscriptItem }
   | {
       type: "delta";

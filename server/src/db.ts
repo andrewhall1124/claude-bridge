@@ -7,6 +7,7 @@ import { log } from "./logger.js";
 import type {
   Job,
   JobStatus,
+  PermissionMode,
   Repo,
   SessionMeta,
   SessionStatus,
@@ -68,6 +69,16 @@ CREATE TABLE IF NOT EXISTS settings (
   value TEXT NOT NULL
 );
 `);
+
+// Migration: per-session permission mode (added after initial release).
+{
+  const cols = db.prepare(`PRAGMA table_info(sessions)`).all() as { name: string }[];
+  if (!cols.some((c) => c.name === "permission_mode")) {
+    db.exec(
+      `ALTER TABLE sessions ADD COLUMN permission_mode TEXT NOT NULL DEFAULT 'default'`,
+    );
+  }
+}
 
 const now = () => new Date().toISOString();
 
@@ -146,6 +157,7 @@ interface SessionRow {
   repo_id: string;
   title: string;
   status: string;
+  permission_mode: string;
   created_at: string;
   last_active_at: string;
 }
@@ -157,19 +169,29 @@ function rowToSession(r: SessionRow): SessionMeta {
     repoId: r.repo_id,
     title: r.title,
     status: r.status as SessionStatus,
+    permissionMode: (r.permission_mode as SessionMeta["permissionMode"]) ?? "default",
     createdAt: r.created_at,
     lastActiveAt: r.last_active_at,
   };
 }
 
-export function createSession(repoId: string, title: string): SessionMeta {
+export function createSession(
+  repoId: string,
+  title: string,
+  permissionMode?: PermissionMode,
+): SessionMeta {
   const id = randomUUID();
   const ts = now();
+  const mode = permissionMode ?? getSettings().defaultPermissionMode;
   db.prepare(
-    `INSERT INTO sessions (id, sdk_session_id, repo_id, title, status, created_at, last_active_at)
-     VALUES (?, NULL, ?, ?, 'idle', ?, ?)`,
-  ).run(id, repoId, title, ts, ts);
+    `INSERT INTO sessions (id, sdk_session_id, repo_id, title, status, permission_mode, created_at, last_active_at)
+     VALUES (?, NULL, ?, ?, 'idle', ?, ?, ?)`,
+  ).run(id, repoId, title, mode, ts, ts);
   return getSession(id)!;
+}
+
+export function setSessionMode(id: string, mode: PermissionMode): void {
+  db.prepare(`UPDATE sessions SET permission_mode = ? WHERE id = ?`).run(mode, id);
 }
 
 export function getSession(id: string): SessionMeta | undefined {
