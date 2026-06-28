@@ -1,0 +1,23 @@
+{
+  "name": "claude-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bridge — a personal Claude Code wrapper: phone/laptop PWA driving Claude Code on a VPS over Tailscale",
+  "type": "module",
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "build": "npm --workspace web run build",
+    "start": "npm run build && npm --workspace server run start",
+    "dev:server": "npm --workspace server run dev",
+    "dev:web": "npm --workspace web run dev",
+    "typecheck": "npm --workspace server run typecheck && npm --workspace web run typecheck",
+    "start:server": "npm --workspace server run start"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}

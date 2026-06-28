@@ -1,0 +1,16 @@
+{
+  "port": 8787,
+  "bindAddress": "127.0.0.1",
+  "dbPath": "./data/bridge.sqlite",
+  "anthropicApiKey": null,
+  "defaultModel": "sonnet",
+  "defaultPermissionMode": "default",
+  "jobConcurrency": 1,
+  "repos": [
+    {
+      "id": "example",
+      "name": "Example repo",
+      "path": "/srv/repos/example"
+    }
+  ]
+}
