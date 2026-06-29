@@ -6,18 +6,14 @@ import type { AnyServerEvent, PermissionMode, Repo, SessionMeta } from "./protoc
 import { Sidebar } from "./components/Sidebar";
 import { AddRepoModal } from "./components/AddRepoModal";
 import { ChatPane } from "./components/ChatPane";
-import { Activity } from "./components/Activity";
 import { CodePane } from "./components/CodePane";
-import { Jobs } from "./components/Jobs";
 import { Settings } from "./components/Settings";
 
-type Tab = "chat" | "activity" | "code" | "jobs" | "settings";
+type Tab = "chat" | "code" | "settings";
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "chat", label: "Chat", icon: "💬" },
-  { id: "activity", label: "Activity", icon: "📡" },
   { id: "code", label: "Code", icon: "📁" },
-  { id: "jobs", label: "Jobs", icon: "⚙" },
   { id: "settings", label: "Settings", icon: "⚙️" },
 ];
 
@@ -196,21 +192,14 @@ export function App() {
             onSetMode={setMode}
           />
         );
-      case "activity":
-        return <Activity session={selectedSession} stream={stream} />;
       case "code":
         return <CodePane repoId={selectedRepoId} />;
-      case "jobs":
-        return <Jobs repos={repos} selectedRepoId={selectedRepoId} />;
       case "settings":
         return <Settings repos={repos} />;
       default:
         return null;
     }
   }
-
-  // On wide screens, show the code column alongside chat / activity.
-  const showRightCode = wide && (tab === "chat" || tab === "activity");
 
   return (
     <div className="app">
@@ -277,12 +266,6 @@ export function App() {
         )}
 
         <main className="main">{renderMain()}</main>
-
-        {showRightCode && (
-          <div className="right-col">
-            <CodePane repoId={selectedRepoId} />
-          </div>
-        )}
       </div>
 
       {!wide && (
