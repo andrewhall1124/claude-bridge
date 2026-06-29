@@ -253,7 +253,9 @@ in the Settings tab (stored in SQLite, seeded from config on first boot).
   file viewer with line numbers, hover-to-highlight a symbol's occurrences, and
   click-a-symbol to **find usages** repo-wide (whole-word `git grep`) with clickable
   jump-to-line results. A separate Diff tab shows uncommitted changes with commit/discard.
-- **Deploy page:** when a Railway API token is configured (`RAILWAY_API_TOKEN`), the Deploy
+- **Deploy page:** configure Railway right in the app — **Settings → Railway** (token +
+  default environment), or via `RAILWAY_API_TOKEN` / `RAILWAY_ENVIRONMENT`. The token is
+  stored server-side and never sent back to the browser. When configured, the Deploy
   tab is scoped to the selected repo (like Chat/Code). Link a repo to one of your Railway
   projects once, then the page shows every service in that project with its latest
   deployment's status (color-coded), commit subject/SHA, and time — auto-refreshing every

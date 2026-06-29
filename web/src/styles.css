@@ -2254,3 +2254,17 @@ body::after {
     flex-basis: 40%;
   }
 }
+
+/* settings: railway section */
+.settings-section {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+.settings-section h3 {
+  margin: 0 0 6px;
+}
+.settings-hint {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+}

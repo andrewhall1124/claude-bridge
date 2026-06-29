@@ -354,21 +354,44 @@ export async function buildServer(): Promise<FastifyInstance> {
   );
 
   // ---- Railway (Deploy page) ---------------------------------------------
-  // Whether Railway is configured + safe defaults (never returns the token).
-  app.get("/api/railway/config", async () => {
+  // Token + environment resolve DB-first (set via the UI) then fall back to
+  // env/config. The token stays server-side and is never returned to the client.
+  function resolvedRailway(): { token: string | null; environment: string } {
     const cfg = getConfig();
     return {
-      configured: Boolean(cfg.railwayApiToken),
-      environment: cfg.railwayEnvironment,
+      token: dbm.getSetting("railwayApiToken") ?? cfg.railwayApiToken,
+      environment: dbm.getSetting("railwayEnvironment") ?? cfg.railwayEnvironment,
     };
+  }
+
+  app.get("/api/railway/config", async () => {
+    const r = resolvedRailway();
+    return { configured: Boolean(r.token), environment: r.environment };
   });
 
+  // Set the Railway token / environment from the UI. Omit apiToken to keep the
+  // current one; pass an empty string to remove it.
+  app.put<{ Body: { apiToken?: string | null; environment?: string } }>(
+    "/api/railway/config",
+    async (req) => {
+      const body = req.body ?? {};
+      if (body.apiToken !== undefined) {
+        const t = (body.apiToken ?? "").trim();
+        if (t) dbm.setSetting("railwayApiToken", t);
+        else dbm.deleteSetting("railwayApiToken");
+      }
+      if (typeof body.environment === "string")
+        dbm.setSetting("railwayEnvironment", body.environment.trim() || "production");
+      const r = resolvedRailway();
+      return { configured: Boolean(r.token), environment: r.environment };
+    },
+  );
+
   app.get("/api/railway/projects", async (_req, reply) => {
-    const cfg = getConfig();
-    if (!cfg.railwayApiToken)
-      return reply.code(400).send({ error: "Railway is not configured" });
+    const { token } = resolvedRailway();
+    if (!token) return reply.code(400).send({ error: "Railway is not configured" });
     try {
-      return { projects: await railway.listProjects(cfg.railwayApiToken) };
+      return { projects: await railway.listProjects(token) };
     } catch (err) {
       return reply.code(502).send({ error: errMsg(err) });
     }
@@ -377,9 +400,8 @@ export async function buildServer(): Promise<FastifyInstance> {
   app.get<{ Querystring: { project?: string; env?: string } }>(
     "/api/railway/status",
     async (req, reply) => {
-      const cfg = getConfig();
-      if (!cfg.railwayApiToken)
-        return reply.code(400).send({ error: "Railway is not configured" });
+      const { token, environment } = resolvedRailway();
+      if (!token) return reply.code(400).send({ error: "Railway is not configured" });
       const projectId = req.query.project;
       if (!projectId)
         return reply
@@ -387,9 +409,9 @@ export async function buildServer(): Promise<FastifyInstance> {
           .send({ error: "No project specified (link the repo to a Railway project)" });
       try {
         return await railway.getProjectStatus(
-          cfg.railwayApiToken,
+          token,
           projectId,
-          req.query.env ?? cfg.railwayEnvironment,
+          req.query.env ?? environment,
         );
       } catch (err) {
         return reply.code(502).send({ error: errMsg(err) });
@@ -399,12 +421,12 @@ export async function buildServer(): Promise<FastifyInstance> {
 
   // Railway service environment variables.
   function railwayToken(reply: import("fastify").FastifyReply): string | null {
-    const cfg = getConfig();
-    if (!cfg.railwayApiToken) {
+    const { token } = resolvedRailway();
+    if (!token) {
       reply.code(400).send({ error: "Railway is not configured" });
       return null;
     }
-    return cfg.railwayApiToken;
+    return token;
   }
 
   app.get<{

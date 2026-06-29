@@ -147,13 +147,11 @@ export function DeployPane({ repoId, repos, onReposChanged }: Props) {
       <div className="deploy-setup">
         <h3>Railway not configured</h3>
         <p className="subtle">
-          Set a Railway API token to see your deployments. Add to{" "}
-          <code>config.json</code> or the environment:
+          Add your Railway API token in <strong>Settings → Railway</strong> to
+          enable the Deploy page, then link each repo to a Railway project here.
         </p>
-        <pre className="deploy-code">{`RAILWAY_API_TOKEN=your-token
-RAILWAY_ENVIRONMENT=production`}</pre>
         <p className="subtle">
-          Get a token at{" "}
+          Create a token at{" "}
           <a
             href="https://railway.com/account/tokens"
             target="_blank"
@@ -161,8 +159,7 @@ RAILWAY_ENVIRONMENT=production`}</pre>
           >
             railway.com/account/tokens
           </a>
-          , then restart the server. Each repo is then linked to a Railway
-          project here on the Deploy page.
+          .
         </p>
       </div>
     );

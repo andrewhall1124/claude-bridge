@@ -164,6 +164,11 @@ export const api = {
     ),
 
   getRailwayConfig: () => request<RailwayConfig>("/api/railway/config"),
+  setRailwayConfig: (patch: { apiToken?: string | null; environment?: string }) =>
+    request<RailwayConfig>("/api/railway/config", {
+      method: "PUT",
+      body: JSON.stringify(patch),
+    }),
   getRailwayProjects: () =>
     request<{ projects: RailwayProject[] }>("/api/railway/projects"),
   getRailwayStatus: (project?: string, env?: string) => {
