@@ -450,6 +450,11 @@ select:focus {
   flex-direction: column;
   gap: 10px;
 }
+/* Prevent flex-shrink from collapsing rows (e.g. tool nodes use overflow:hidden,
+   which makes min-height resolve to 0) once the transcript overflows. */
+.chat-scroll > * {
+  flex-shrink: 0;
+}
 .msg-row {
   display: flex;
 }
