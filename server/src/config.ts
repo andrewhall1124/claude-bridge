@@ -178,7 +178,7 @@ export function getConfig(): AppConfig {
     bindAddress: process.env.BIND_ADDRESS ?? file.bindAddress ?? "127.0.0.1",
     dbPath: resolve(process.env.DB_PATH ?? file.dbPath ?? "./data/bridge.sqlite"),
     anthropicApiKey,
-    defaultModel: process.env.DEFAULT_MODEL ?? file.defaultModel ?? "sonnet",
+    defaultModel: process.env.DEFAULT_MODEL ?? file.defaultModel ?? "opus",
     defaultPermissionMode: asPermissionMode(
       process.env.DEFAULT_PERMISSION_MODE,
       file.defaultPermissionMode ?? "default",

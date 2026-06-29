@@ -261,7 +261,7 @@ export function App() {
           />
         );
       case "settings":
-        return <Settings repos={repos} />;
+        return <Settings />;
       default:
         return null;
     }

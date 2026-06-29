@@ -106,7 +106,7 @@ repos.
   "port": 8787,
   "bindAddress": "100.x.y.z",
   "dbPath": "./data/bridge.sqlite",
-  "defaultModel": "sonnet",
+  "defaultModel": "opus",
   "defaultPermissionMode": "default",
   "repos": [
     { "id": "web", "name": "My Web App", "path": "/srv/repos/web" },

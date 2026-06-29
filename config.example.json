@@ -3,7 +3,7 @@
   "bindAddress": "127.0.0.1",
   "dbPath": "./data/bridge.sqlite",
   "anthropicApiKey": null,
-  "defaultModel": "sonnet",
+  "defaultModel": "opus",
   "defaultPermissionMode": "default",
   "repos": [
     {

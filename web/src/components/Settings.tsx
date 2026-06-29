@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
-import type { PermissionMode, Repo, Settings as SettingsType } from "../protocol";
+import type { PermissionMode, Settings as SettingsType } from "../protocol";
 
 const MODEL_SUGGESTIONS = ["opus", "sonnet", "haiku"];
 const MODE_OPTIONS: { value: PermissionMode; label: string }[] = [
@@ -13,7 +13,7 @@ const MODE_OPTIONS: { value: PermissionMode; label: string }[] = [
   },
 ];
 
-export function Settings({ repos }: { repos: Repo[] }) {
+export function Settings() {
   const [settings, setSettings] = useState<SettingsType | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -121,19 +121,6 @@ export function Settings({ repos }: { repos: Repo[] }) {
         {status && <span className="subtle">{status}</span>}
         {error && <span className="system-line error">⚠ {error}</span>}
       </div>
-
-      <h3>Configured repos</h3>
-      {repos.length === 0 && (
-        <div className="empty-state subtle">No repos configured.</div>
-      )}
-      <ul className="repo-config-list">
-        {repos.map((r) => (
-          <li key={r.id}>
-            <span className="repo-config-name">{r.name}</span>
-            <span className="repo-config-path subtle">{r.path}</span>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
