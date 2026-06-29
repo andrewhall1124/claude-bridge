@@ -933,27 +933,187 @@ select:focus {
 .file-view {
   flex: 1;
   min-width: 0;
-  overflow: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 .file-view-head {
+  flex: 0 0 auto;
   padding: 8px 12px;
   border-bottom: 1px solid var(--border);
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: 12.5px;
   color: var(--text-dim);
-  position: sticky;
-  top: 0;
   background: var(--bg-1);
 }
-.file-content {
-  margin: 0;
-  padding: 12px;
-  font-family: ui-monospace, monospace;
+
+/* ---------- code view (syntax highlight + symbol layer) ---------- */
+.cv {
+  flex: 1 1 auto;
+  overflow: auto;
+  font-family: var(--font-mono);
   font-size: 12.5px;
+  line-height: 1.5;
+  padding: 6px 0;
+}
+.cv-plain {
+  padding: 12px;
+}
+.cv-plain pre {
+  margin: 0;
   white-space: pre;
-  overflow-x: auto;
+}
+.cv-note {
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.cv-row {
+  display: flex;
+}
+.cv-ln {
+  position: sticky;
+  left: 0;
+  flex: 0 0 auto;
+  width: 3.4em;
+  padding-right: 12px;
+  text-align: right;
+  color: var(--text-dim);
+  background: var(--bg);
+  user-select: none;
+}
+.cv-code {
+  flex: 1 1 auto;
+  white-space: pre;
+  padding-right: 16px;
+}
+.cv-row.cv-flash {
+  background: rgba(255, 140, 66, 0.12);
+}
+.tok-kw {
+  color: var(--accent);
+}
+.tok-str {
+  color: var(--ok);
+}
+.tok-com {
+  color: var(--text-dim);
+  font-style: italic;
+}
+.tok-num {
+  color: var(--accent-2);
+}
+.tok-id {
+  color: var(--text);
+}
+.tok-punct {
+  color: var(--text-dim);
+}
+.tok-id:hover {
+  cursor: pointer;
+}
+.tok-id.sym-hl {
+  background: rgba(255, 140, 66, 0.18);
+  box-shadow: inset 0 -1px 0 var(--accent);
+}
+
+/* ---------- references / find-usages panel ---------- */
+.refs-panel {
+  flex: 0 0 auto;
+  max-height: 40%;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+  background: var(--bg-1);
+}
+.refs-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+}
+.refs-sym {
+  color: var(--accent);
+  text-transform: none;
+}
+.refs-empty {
+  padding: 10px;
+  font-size: 12.5px;
+}
+.refs-list {
+  overflow: auto;
+}
+.ref-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  padding: 5px 10px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.ref-row:hover {
+  background: var(--bg-2);
+}
+.ref-loc {
+  flex: 0 0 auto;
+  color: var(--accent-2);
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ref-text {
+  flex: 1 1 auto;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* file-type icons in the tree */
+.ficon {
+  display: inline-block;
+  width: 1.9em;
+  text-align: center;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  flex: 0 0 auto;
+}
+.fi-code {
+  color: var(--accent);
+}
+.fi-web {
+  color: var(--accent-2);
+}
+.fi-data {
+  color: var(--warn);
+}
+.fi-doc {
+  color: var(--text-dim);
+}
+.fi-media {
+  color: var(--ok);
+}
+.fi-default {
+  color: var(--text-dim);
+}
+.tree-chevron {
+  color: var(--text-dim);
+  width: 1.9em;
+  text-align: center;
+  flex: 0 0 auto;
 }
 
 .diff-view {

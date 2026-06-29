@@ -201,6 +201,24 @@ export async function buildServer(): Promise<FastifyInstance> {
     return { ok: true };
   });
 
+  // Find usages (whole-word, repo-wide textual search)
+  app.get<{ Params: { id: string }; Querystring: { symbol?: string } }>(
+    "/api/repos/:id/references",
+    async (req, reply) => {
+      const repo = requireRepo(req.params.id);
+      const symbol = (req.query.symbol ?? "").trim();
+      if (!symbol) return reply.code(400).send({ error: "symbol is required" });
+      try {
+        if (!(await git.isGitRepo(repo.path)))
+          return { symbol, matches: [], truncated: false, notGit: true };
+        const res = await git.findReferences(repo.path, symbol);
+        return { symbol, ...res };
+      } catch (err) {
+        return reply.code(400).send({ error: errMsg(err) });
+      }
+    },
+  );
+
   // Repo file browsing
   app.get<{ Params: { id: string }; Querystring: { path?: string } }>(
     "/api/repos/:id/files",

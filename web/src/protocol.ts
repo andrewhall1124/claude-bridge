@@ -147,6 +147,19 @@ export interface NotGitResult {
   notGit: true;
 }
 
+export interface ReferenceMatch {
+  path: string;
+  line: number;
+  text: string;
+}
+
+export interface ReferencesResult {
+  symbol: string;
+  matches: ReferenceMatch[];
+  truncated: boolean;
+  notGit?: boolean;
+}
+
 // ---- WebSocket server -> client events ----
 export type ServerEvent =
   | { type: "hello"; sessionId: string; status: SessionStatus; mode: PermissionMode }

@@ -237,8 +237,16 @@ in the Settings tab (stored in SQLite, seeded from config on first boot).
   question picker (each question's options as single- or multi-select, plus an "Other"
   free-text field) instead of a generic approve/reject. Your selection is delivered back
   to the model as the tool's answer.
-- **Code & diff:** all repo file/diff/commit/discard operations are scoped to the repo
-  root and reject any path that escapes it.
+- **Code page:** an IDE-style file tree with per-type file icons, a syntax-highlighted
+  file viewer with line numbers, hover-to-highlight a symbol's occurrences, and
+  click-a-symbol to **find usages** repo-wide (whole-word `git grep`) with clickable
+  jump-to-line results. A separate Diff tab shows uncommitted changes with commit/discard.
+- **Path safety:** all repo file/diff/commit/discard/usages operations are scoped to the
+  repo root and reject any path that escapes it.
+
+> Find-usages is a fast textual (whole-word) search, not a semantic/LSP reference search —
+> it won't distinguish a variable from an unrelated same-named symbol. A real
+> go-to-references would require a per-language language server.
 
 ### Model & persona
 

@@ -6,6 +6,7 @@ import type {
   FileContent,
   FileListing,
   NotGitResult,
+  ReferencesResult,
   Repo,
   SessionMeta,
   Settings,
@@ -103,6 +104,10 @@ export const api = {
   readFile: (repoId: string, path: string) =>
     request<FileContent>(
       `/api/repos/${encodeURIComponent(repoId)}/file?path=${encodeURIComponent(path)}`
+    ),
+  findReferences: (repoId: string, symbol: string) =>
+    request<ReferencesResult>(
+      `/api/repos/${encodeURIComponent(repoId)}/references?symbol=${encodeURIComponent(symbol)}`
     ),
   getDiff: (repoId: string) =>
     request<DiffResult | NotGitResult>(

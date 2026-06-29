@@ -223,6 +223,53 @@ export async function changedFiles(root: string): Promise<string[]> {
   return entries.map((e) => e.path);
 }
 
+// ---- Find usages (textual, whole-word) -----------------------------------
+export interface RefMatch {
+  path: string;
+  line: number;
+  text: string;
+}
+
+const IDENT_RE = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+
+// Whole-word, repo-wide occurrences of an identifier via `git grep`. This is a
+// textual search (not a semantic/LSP reference search), scoped to tracked files
+// and respecting .gitignore.
+export async function findReferences(
+  root: string,
+  symbol: string,
+  limit = 500,
+): Promise<{ matches: RefMatch[]; truncated: boolean }> {
+  if (!IDENT_RE.test(symbol)) return { matches: [], truncated: false };
+  let out = "";
+  try {
+    out = (
+      await exec(
+        "git",
+        ["grep", "-n", "-w", "-I", "--no-color", "-e", symbol, "--", "."],
+        { cwd: root, maxBuffer: 64 * 1024 * 1024 },
+      )
+    ).stdout;
+  } catch (err) {
+    // `git grep` exits 1 when there are no matches — that's not an error.
+    const e = err as { code?: number; stdout?: string };
+    out = typeof e.stdout === "string" ? e.stdout : "";
+  }
+  const rows = out.split("\n").filter(Boolean);
+  const matches: RefMatch[] = [];
+  for (const row of rows) {
+    const m = row.match(/^(.*?):(\d+):(.*)$/);
+    if (!m) continue;
+    matches.push({
+      path: m[1]!.replace(/\\/g, "/"),
+      line: Number(m[2]),
+      text: m[3]!.slice(0, 300),
+    });
+    if (matches.length >= limit) break;
+  }
+  return { matches, truncated: rows.length > matches.length };
+}
+
 // ---- Adding repos --------------------------------------------------------
 
 // Expand a leading "~" to the owner's home directory and resolve to absolute.
