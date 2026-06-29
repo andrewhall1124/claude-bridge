@@ -22,7 +22,36 @@ nothing exposed to the public internet.
 
 ---
 
-## 1. Provision the box
+## Fast path: automated provisioning (`hcloud`)
+
+If you have the [`hcloud` CLI](https://github.com/hetznercloud/cli) (`brew install hcloud`),
+`deploy/provision.sh` + `deploy/cloud-init.yaml` create and bootstrap the box in one
+command — Node, Tailscale, clone, build, systemd, firewall, and (optionally) the CI
+deploy key — leaving only the interactive `claude login`.
+
+```bash
+hcloud context create bridge        # paste a Read&Write API token from the Hetzner console
+
+export TS_AUTHKEY=tskey-...          # ephemeral/reusable Tailscale auth key
+export DEPLOY_PUBKEY="$(cat bridge-deploy.pub)"   # optional: bakes in the CI deploy key
+./deploy/provision.sh               # creates server 'bridge' (cx22, ubuntu-24.04, nbg1)
+```
+
+Then, over Tailscale:
+
+```bash
+ssh bridge@bridge.<your-tailnet>.ts.net
+cd /srv/claude-bridge && npx claude login && sudo systemctl start bridge
+```
+
+Overridable via env: `SERVER_NAME`, `SERVER_TYPE`, `IMAGE`, `LOCATION`, `REPO_URL`,
+`ADMIN_PUBKEY_FILE`. The Tailscale auth key is written into the server's user-data, so
+use a **short-lived / single-use** key. The manual walkthrough below is the same steps,
+done by hand.
+
+---
+
+## 1. Provision the box (manual)
 
 - Create a Hetzner Cloud server. **CX22** (2 vCPU / 4 GB, ~€3.79/mo) is the sweet spot:
   `better-sqlite3` compiles a native addon and the Agent SDK spawns Claude Code

@@ -1,0 +1,85 @@
+#cloud-config
+# Bridge VPS bootstrap. Rendered by deploy/provision.sh (which substitutes the
+# __PLACEHOLDERS__) and passed to `hcloud server create --user-data-from-file`.
+# Runs once, as root, on first boot. Everything here is non-interactive; the ONLY
+# manual step left afterwards is `claude login` (interactive OAuth) — see the end.
+package_update: true
+packages:
+  - git
+  - build-essential
+  - python3
+  - ufw
+
+write_files:
+  - path: /root/bootstrap.sh
+    permissions: "0755"
+    content: |
+      #!/usr/bin/env bash
+      set -euxo pipefail
+
+      REPO_URL="__REPO_URL__"
+      APP_DIR=/srv/claude-bridge
+
+      # --- Node 20 (nodesource) ---
+      curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+      apt-get install -y nodejs
+
+      # --- Tailscale (the security boundary) ---
+      curl -fsSL https://tailscale.com/install.sh | sh
+      tailscale up --authkey='__TS_AUTHKEY__' --hostname=bridge --ssh
+      TS_IP="$(tailscale ip -4 | head -1)"
+
+      # --- Service user (home separate from the repo so ~/.claude creds persist) ---
+      useradd --create-home --shell /bin/bash bridge
+      mkdir -p "$APP_DIR" /srv/repos
+      chown bridge:bridge "$APP_DIR" /srv/repos
+
+      # --- Clone, install, build (as the bridge user) ---
+      su - bridge -c "git clone $REPO_URL $APP_DIR"
+      su - bridge -c "cd $APP_DIR && npm ci && npm run build"
+
+      # --- .env: bind ONLY to the tailnet IP ---
+      cat > "$APP_DIR/.env" <<ENV
+      PORT=8787
+      BIND_ADDRESS=$TS_IP
+      DB_PATH=./data/bridge.sqlite
+      DEFAULT_MODEL=sonnet
+      DEFAULT_PERMISSION_MODE=default
+      REPOS_DIR=/srv/repos
+      ENV
+      chown bridge:bridge "$APP_DIR/.env"
+
+      # --- Deploy key for CI (so push-to-main works immediately), if provided ---
+      install -d -o bridge -g bridge -m 700 /home/bridge/.ssh
+      if [ -n "__DEPLOY_PUBKEY__" ]; then
+        echo "__DEPLOY_PUBKEY__" >> /home/bridge/.ssh/authorized_keys
+        chown bridge:bridge /home/bridge/.ssh/authorized_keys
+        chmod 600 /home/bridge/.ssh/authorized_keys
+      fi
+
+      # --- systemd unit + sudoers (single source of truth = repo files) ---
+      cp "$APP_DIR/deploy/bridge.service" /etc/systemd/system/bridge.service
+      echo 'bridge ALL=(root) NOPASSWD: /usr/bin/systemctl restart bridge' \
+        > /etc/sudoers.d/bridge-deploy
+      chmod 440 /etc/sudoers.d/bridge-deploy
+      systemctl daemon-reload
+      # Enabled (starts on boot) but NOT started yet — it would crash-loop until
+      # `claude login` runs. Start it once login is done.
+      systemctl enable bridge
+
+      # --- Firewall: app port is tailnet-only; keep public SSH for admin ---
+      ufw allow in on tailscale0
+      ufw allow 22/tcp
+      ufw deny 8787/tcp
+      ufw --force enable
+
+      echo "=================================================================="
+      echo " Bridge bootstrap complete. Tailnet IP: $TS_IP"
+      echo " Remaining manual step (subscription billing):"
+      echo "   ssh bridge@$TS_IP   # over Tailscale"
+      echo "   cd /srv/claude-bridge && npx claude login"
+      echo "   sudo systemctl start bridge"
+      echo "=================================================================="
+
+runcmd:
+  - /root/bootstrap.sh 2>&1 | tee /var/log/bridge-bootstrap.log
