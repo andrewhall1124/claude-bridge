@@ -177,7 +177,7 @@ export function App() {
   function selectSession(id: string) {
     setSelectedSessionId(id);
     setSidebarOpen(false);
-    if (!wide) setTab("chat");
+    setTab("chat"); // picking a session always opens the chat window
   }
 
   async function newSession() {
@@ -188,7 +188,7 @@ export function App() {
       await loadSessions();
       setSelectedSessionId(res.session.id);
       setSidebarOpen(false);
-      if (!wide) setTab("chat");
+      setTab("chat"); // a new session opens straight into chat
     } catch (err) {
       alert(err instanceof Error ? err.message : String(err));
     } finally {
