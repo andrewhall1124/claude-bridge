@@ -11,5 +11,11 @@
       "name": "Example repo",
       "path": "/srv/repos/example"
     }
-  ]
+  ],
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    }
+  }
 }

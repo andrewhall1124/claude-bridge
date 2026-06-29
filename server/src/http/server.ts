@@ -114,6 +114,20 @@ export async function buildServer(): Promise<FastifyInstance> {
     }
   });
 
+  // Rename a repo's display name.
+  app.patch<{ Params: { id: string }; Body: { name?: string } }>(
+    "/api/repos/:id",
+    async (req, reply) => {
+      const repo = dbm.getRepo(req.params.id);
+      if (!repo) return reply.code(404).send({ error: "Unknown repo" });
+      const name = req.body?.name?.trim();
+      if (!name) return reply.code(400).send({ error: "name is required" });
+      dbm.renameRepo(repo.id, name);
+      emitGlobal({ type: "repos_changed" });
+      return { repo: dbm.getRepo(repo.id) };
+    },
+  );
+
   // Unregister a repo (files on disk are left untouched).
   app.delete<{ Params: { id: string } }>("/api/repos/:id", async (req, reply) => {
     const repo = dbm.getRepo(req.params.id);

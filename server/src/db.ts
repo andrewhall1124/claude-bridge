@@ -104,6 +104,12 @@ export function deleteRepo(id: string): void {
   db.prepare(`DELETE FROM repos WHERE id = ?`).run(id);
 }
 
+// Rename a repo's display name. A config-defined repo reverts to its config
+// name on next boot via syncRepos.
+export function renameRepo(id: string, name: string): void {
+  db.prepare(`UPDATE repos SET name = ? WHERE id = ?`).run(name, id);
+}
+
 // ---- Settings ------------------------------------------------------------
 export function getSetting(key: string): string | undefined {
   const row = db.prepare(`SELECT value FROM settings WHERE key = ?`).get(key) as

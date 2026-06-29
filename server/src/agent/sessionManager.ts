@@ -291,6 +291,7 @@ function startSession(sessionId: string): ActiveSession {
     cwd: repo.path,
     model: settings.defaultModel,
     permissionMode: sdkPermissionMode(permissionMode),
+    mcpServers: config.mcpServers,
     // The SDK requires this opt-in before bypassPermissions can take effect.
     // We enable it for chat sessions so the owner can switch a live session
     // into bypass from the UI. It is only a *precondition* — it never bypasses

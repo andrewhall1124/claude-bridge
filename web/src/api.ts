@@ -59,6 +59,11 @@ export const api = {
       method: "POST",
       body: JSON.stringify(req),
     }),
+  renameRepo: (id: string, name: string) =>
+    request<{ repo: Repo }>(`/api/repos/${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ name }),
+    }),
   deleteRepo: (id: string) =>
     request<{ ok: true }>(`/api/repos/${encodeURIComponent(id)}`, {
       method: "DELETE",
