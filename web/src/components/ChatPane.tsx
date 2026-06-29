@@ -7,18 +7,19 @@ import { Question } from "./Question";
 import { Transcript, pendingToolName } from "./Transcript";
 import { Markdown } from "./Markdown";
 
-const MODE_OPTIONS: { value: PermissionMode; label: string }[] = [
-  { value: "default", label: "default — ask before edits/commands" },
-  { value: "acceptEdits", label: "acceptEdits — auto-approve file edits" },
-  { value: "plan", label: "plan — explore only, no changes" },
-  { value: "bypassPermissions", label: "bypass — run everything unprompted ⚠" },
+// Short, color-coded modes, ordered by ascending risk.
+const MODES: { value: PermissionMode; abbr: string; title: string }[] = [
+  { value: "plan", abbr: "PLAN", title: "Plan — explore only, no changes" },
+  { value: "default", abbr: "ASK", title: "Ask before edits & commands" },
+  { value: "acceptEdits", abbr: "EDIT", title: "Auto-approve file edits" },
+  { value: "bypassPermissions", abbr: "BYPASS", title: "Run everything unprompted ⚠" },
 ];
 
-const MODE_BADGE: Record<PermissionMode, string> = {
-  default: "default",
-  acceptEdits: "accept edits",
-  plan: "plan",
-  bypassPermissions: "BYPASS ⚠",
+const MODE_ABBR: Record<PermissionMode, string> = {
+  plan: "PLAN",
+  default: "ASK",
+  acceptEdits: "EDIT",
+  bypassPermissions: "BYPASS",
 };
 
 interface Props {
@@ -86,7 +87,7 @@ export function ChatPane({
         <span className="subtle">{session.title || "session"}</span>
         <span className="spacer" />
         <span className={`mode-badge mode-${mode}`} title={`Permission mode: ${mode}`}>
-          {MODE_BADGE[mode]}
+          {MODE_ABBR[mode]}
         </span>
         <span className={`status-badge status-${stream.status}`}>{stream.status}</span>
       </div>
@@ -148,19 +149,21 @@ export function ChatPane({
 
       <div className="chat-input">
         <div className="chat-input-controls">
-          <label className="mode-select">
-            <span className="subtle">Mode</span>
-            <select
-              value={mode}
-              onChange={(e) => onSetMode(e.target.value as PermissionMode)}
-            >
-              {MODE_OPTIONS.map((m) => (
-                <option key={m.value} value={m.value}>
-                  {m.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="mode-seg" role="group" aria-label="Permission mode">
+            {MODES.map((m) => (
+              <button
+                key={m.value}
+                type="button"
+                className={`mode-chip mode-${m.value} ${mode === m.value ? "active" : ""}`}
+                title={m.title}
+                aria-pressed={mode === m.value}
+                onClick={() => onSetMode(m.value)}
+              >
+                {m.abbr}
+              </button>
+            ))}
+          </div>
+          <span className="spacer" />
           {running && (
             <button
               className="btn btn-danger btn-sm"

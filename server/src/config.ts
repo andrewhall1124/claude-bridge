@@ -6,6 +6,13 @@ import type { PermissionMode, Repo } from "./protocol.js";
 
 dotenv.config();
 
+export interface McpServerEntry {
+  command: string;
+  args?: string[];
+  env?: Record<string, string>;
+  type?: "stdio";
+}
+
 export interface AppConfig {
   port: number;
   bindAddress: string;
@@ -16,6 +23,7 @@ export interface AppConfig {
   defaultModel: string;
   defaultPermissionMode: PermissionMode;
   repos: Repo[];
+  mcpServers: Record<string, McpServerEntry>;
 }
 
 interface FileConfig {
@@ -27,6 +35,7 @@ interface FileConfig {
   defaultPermissionMode?: PermissionMode;
   repos?: Repo[];
   reposDir?: string;
+  mcpServers?: Record<string, McpServerEntry>;
 }
 
 const DEFAULT_PERMISSION_MODES: PermissionMode[] = [
@@ -150,6 +159,7 @@ export function getConfig(): AppConfig {
       file.defaultPermissionMode ?? "default",
     ),
     repos: resolveRepos(file),
+    mcpServers: file.mcpServers ?? {},
   };
 
   if (cached.anthropicApiKey) {
