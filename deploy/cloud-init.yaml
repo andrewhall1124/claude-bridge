@@ -83,7 +83,7 @@ write_files:
       echo " Remaining manual step (subscription billing):"
       echo "   ssh bridge@$TS_IP   # over Tailscale"
       echo "   claude login"
-      echo "   sudo systemctl start bridge"
+      echo "   sudo systemctl restart bridge"
       echo "=================================================================="
 
 runcmd:

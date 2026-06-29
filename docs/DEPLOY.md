@@ -41,7 +41,7 @@ Then, over Tailscale:
 
 ```bash
 ssh bridge@bridge.<your-tailnet>.ts.net
-claude login && sudo systemctl start bridge
+claude login && sudo systemctl restart bridge   # restart (not start) — that's the NOPASSWD-allowed command
 ```
 
 Overridable via env: `SERVER_NAME`, `SERVER_TYPE`, `IMAGE`, `LOCATION`, `REPO_URL`,
