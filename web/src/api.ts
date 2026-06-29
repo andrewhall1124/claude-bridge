@@ -5,6 +5,9 @@ import type {
   DiffResult,
   FileContent,
   FileListing,
+  GitHubAuthStatus,
+  GitHubDevicePoll,
+  GitHubDeviceStart,
   McpServerConfig,
   NotGitResult,
   RailwayConfig,
@@ -102,6 +105,15 @@ export const api = {
       method: "PUT",
       body: JSON.stringify({ hooks }),
     }),
+
+  // GitHub auth (device flow)
+  getGitHubStatus: () => request<GitHubAuthStatus>("/api/github/status"),
+  startGitHubDevice: () =>
+    request<GitHubDeviceStart>("/api/github/device", { method: "POST", body: "{}" }),
+  pollGitHubDevice: () =>
+    request<GitHubDevicePoll>("/api/github/device/poll", { method: "POST", body: "{}" }),
+  signOutGitHub: () =>
+    request<{ ok: true }>("/api/github/signout", { method: "POST", body: "{}" }),
 
   getSessions: () => request<{ sessions: SessionMeta[] }>("/api/sessions"),
   createSession: (repoId: string, title?: string) =>

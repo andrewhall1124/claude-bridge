@@ -4,8 +4,9 @@ import { McpSettings } from "./settings/McpSettings";
 import { ClaudeMdSettings } from "./settings/ClaudeMdSettings";
 import { HooksSettings } from "./settings/HooksSettings";
 import { RailwaySettings } from "./settings/RailwaySettings";
+import { GitHubSettings } from "./settings/GitHubSettings";
 
-type Section = "general" | "mcp" | "claudemd" | "hooks" | "railway";
+type Section = "general" | "mcp" | "claudemd" | "hooks" | "railway" | "github";
 
 const SECTIONS: { id: Section; label: string }[] = [
   { id: "general", label: "General" },
@@ -13,6 +14,7 @@ const SECTIONS: { id: Section; label: string }[] = [
   { id: "claudemd", label: "CLAUDE.md" },
   { id: "hooks", label: "Hooks" },
   { id: "railway", label: "Railway" },
+  { id: "github", label: "GitHub" },
 ];
 
 export function Settings() {
@@ -39,6 +41,7 @@ export function Settings() {
       {section === "claudemd" && <ClaudeMdSettings />}
       {section === "hooks" && <HooksSettings />}
       {section === "railway" && <RailwaySettings />}
+      {section === "github" && <GitHubSettings />}
     </div>
   );
 }

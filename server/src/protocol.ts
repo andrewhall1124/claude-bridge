@@ -133,6 +133,27 @@ export interface McpHttpServer {
 }
 export type McpServerConfig = McpStdioServer | McpHttpServer;
 
+// ---- GitHub auth (device flow, managed via Settings) ----
+export interface GitHubAuthStatus {
+  authenticated: boolean;
+  login?: string;
+  /** Whether the `gh` CLI is installed (and thus also wired up). */
+  ghCli: boolean;
+}
+export interface GitHubDeviceStart {
+  userCode: string;
+  verificationUri: string;
+  expiresIn: number;
+  interval: number;
+}
+export interface GitHubDevicePoll {
+  status: "pending" | "complete" | "expired" | "denied" | "error";
+  login?: string;
+  error?: string;
+  /** Updated poll interval (seconds), bumped on GitHub `slow_down`. */
+  interval?: number;
+}
+
 // ---- AskUserQuestion tool ----
 export interface QuestionOption {
   label: string;

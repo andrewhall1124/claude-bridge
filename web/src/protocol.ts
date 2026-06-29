@@ -60,6 +60,25 @@ export interface McpHttpServer {
 }
 export type McpServerConfig = McpStdioServer | McpHttpServer;
 
+// ---- GitHub auth (device flow, managed via Settings) ----
+export interface GitHubAuthStatus {
+  authenticated: boolean;
+  login?: string;
+  ghCli: boolean;
+}
+export interface GitHubDeviceStart {
+  userCode: string;
+  verificationUri: string;
+  expiresIn: number;
+  interval: number;
+}
+export interface GitHubDevicePoll {
+  status: "pending" | "complete" | "expired" | "denied" | "error";
+  login?: string;
+  error?: string;
+  interval?: number;
+}
+
 export interface UploadedFile {
   name: string;
   path: string;

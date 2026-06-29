@@ -14,6 +14,7 @@ import * as git from "../git/repo.js";
 import * as railway from "../railway/client.js";
 import { getConfig } from "../config.js";
 import * as userClaude from "../userClaude.js";
+import * as github from "../github.js";
 import { randomSessionName } from "../names.js";
 import type { PermissionMode, Repo, Settings } from "../protocol.js";
 
@@ -208,6 +209,30 @@ export async function buildServer(): Promise<FastifyInstance> {
     } catch (err) {
       return reply.code(400).send({ error: errMsg(err) });
     }
+  });
+
+  // ---- GitHub auth (device flow) -----------------------------------------
+  app.get("/api/github/status", async () => github.getStatus());
+
+  app.post("/api/github/device", async (_req, reply) => {
+    try {
+      return await github.startDeviceFlow();
+    } catch (err) {
+      return reply.code(502).send({ error: errMsg(err) });
+    }
+  });
+
+  app.post("/api/github/device/poll", async (_req, reply) => {
+    try {
+      return await github.pollDeviceFlow();
+    } catch (err) {
+      return reply.code(502).send({ error: errMsg(err) });
+    }
+  });
+
+  app.post("/api/github/signout", async () => {
+    github.signOut();
+    return { ok: true };
   });
 
   // Sessions
