@@ -18,3 +18,7 @@ data/
 
 # Build artifacts
 web/dev-dist/
+
+# Claude Code instance-local config (not committed)
+.claude/settings.local.json
+.claude/hooks/
