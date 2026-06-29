@@ -1279,22 +1279,27 @@ select:focus {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2px;
   background: transparent;
   border: none;
   color: var(--text-dim);
-  padding: 8px 0;
+  padding: 11px 0;
   cursor: pointer;
-  min-height: var(--bottom-h);
 }
 .bottom-tab.active {
   color: var(--accent);
 }
-.bottom-tab-icon {
-  font-size: 18px;
-}
 .bottom-tab-label {
-  font-size: 11px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Hide the bottom nav while the composer is focused (keyboard up), so the
+   composer sits directly above the keyboard like a native chat app. */
+.app:has(.composer-input:focus) .bottom-tabs {
+  display: none;
 }
 
 /* On narrow screens the file browser stacks vertically. */
