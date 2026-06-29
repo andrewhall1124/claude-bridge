@@ -1517,3 +1517,90 @@ select:focus {
 .md img {
   max-width: 100%;
 }
+
+/* ---------- phosphor flourishes ---------- */
+
+/* bracketed active tab — brackets always reserve space, only color changes */
+.top-tab::before {
+  content: "[";
+  margin-right: 4px;
+  color: transparent;
+}
+.top-tab::after {
+  content: "]";
+  margin-left: 4px;
+  color: transparent;
+}
+.top-tab.active::before,
+.top-tab.active::after {
+  color: var(--accent);
+}
+
+/* faint CRT scanlines over everything (non-interactive) */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.16) 3px
+  );
+}
+
+/* amber-monochrome syntax highlighting (highlight.js tokens) */
+.md .hljs {
+  color: var(--text);
+  background: transparent;
+}
+.md .hljs-comment,
+.md .hljs-quote {
+  color: var(--text-dim);
+  font-style: italic;
+}
+.md .hljs-keyword,
+.md .hljs-selector-tag,
+.md .hljs-built_in,
+.md .hljs-name,
+.md .hljs-tag,
+.md .hljs-meta-keyword {
+  color: var(--accent);
+}
+.md .hljs-string,
+.md .hljs-attr,
+.md .hljs-template-variable,
+.md .hljs-addition,
+.md .hljs-regexp {
+  color: var(--ok);
+}
+.md .hljs-number,
+.md .hljs-literal,
+.md .hljs-type,
+.md .hljs-params,
+.md .hljs-meta,
+.md .hljs-link,
+.md .hljs-symbol,
+.md .hljs-bullet,
+.md .hljs-variable {
+  color: var(--accent-2);
+}
+.md .hljs-title,
+.md .hljs-section,
+.md .hljs-attribute,
+.md .hljs-selector-id,
+.md .hljs-selector-class {
+  color: #ffd9b3;
+  font-weight: 600;
+}
+.md .hljs-deletion {
+  color: var(--danger);
+}
+.md .hljs-emphasis {
+  font-style: italic;
+}
+.md .hljs-strong {
+  font-weight: 700;
+}
