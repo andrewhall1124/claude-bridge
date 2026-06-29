@@ -17,7 +17,7 @@
 set -euo pipefail
 
 SERVER_NAME="${SERVER_NAME:-bridge}"
-SERVER_TYPE="${SERVER_TYPE:-cx22}"          # 2 vCPU / 4 GB shared x86, ~€3.79/mo
+SERVER_TYPE="${SERVER_TYPE:-cax11}"         # 2 vCPU / 4 GB ARM, ~€3.79/mo (cheapest 4 GB)
 IMAGE="${IMAGE:-ubuntu-24.04}"
 LOCATION="${LOCATION:-nbg1}"                 # Nuremberg; or fsn1/hel1/ash/hil
 REPO_URL="${REPO_URL:-https://github.com/andrewhall1124/claude-bridge.git}"

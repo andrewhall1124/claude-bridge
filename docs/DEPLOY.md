@@ -53,9 +53,10 @@ done by hand.
 
 ## 1. Provision the box (manual)
 
-- Create a Hetzner Cloud server. **CX22** (2 vCPU / 4 GB, ~€3.79/mo) is the sweet spot:
-  `better-sqlite3` compiles a native addon and the Agent SDK spawns Claude Code
-  processes, so avoid 512 MB–1 GB boxes.
+- Create a Hetzner Cloud server. **cax11** (2 vCPU / 4 GB ARM, ~€3.79/mo) is the cheapest
+  good fit: `better-sqlite3` compiles a native addon and the Agent SDK spawns Claude Code
+  processes, so avoid 512 MB–1 GB boxes. (x86 equivalent: `cpx22`. ARM is fine — Node 20,
+  Tailscale, and the native addon all build on arm64.)
 - Image: **Ubuntu 24.04**. Add your personal SSH key during creation so you can log in.
 
 ```bash

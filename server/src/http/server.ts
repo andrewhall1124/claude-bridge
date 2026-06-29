@@ -10,6 +10,7 @@ import { closeSession } from "../agent/sessionManager.js";
 import * as git from "../git/repo.js";
 import * as railway from "../railway/client.js";
 import { getConfig } from "../config.js";
+import { randomSessionName } from "../names.js";
 import type { PermissionMode, Repo, Settings } from "../protocol.js";
 
 function slugify(name: string): string {
@@ -183,7 +184,11 @@ export async function buildServer(): Promise<FastifyInstance> {
       ["default", "acceptEdits", "plan", "bypassPermissions"].includes(permissionMode)
         ? permissionMode
         : undefined;
-    const session = dbm.createSession(repoId, title?.trim() || "New session", mode);
+    const session = dbm.createSession(
+      repoId,
+      title?.trim() || randomSessionName(),
+      mode,
+    );
     return { session };
   });
 
