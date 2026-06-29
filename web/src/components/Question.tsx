@@ -80,7 +80,7 @@ export function Question({ pending, onRespond }: Props) {
                   disabled={submitted}
                 >
                   <span className="option-label">
-                    {q.multiSelect ? (active ? "☑" : "☐") : active ? "◉" : "○"}{" "}
+                    {q.multiSelect ? (active ? "[x]" : "[ ]") : active ? "(o)" : "( )"}{" "}
                     {opt.label}
                   </span>
                   {opt.description && (

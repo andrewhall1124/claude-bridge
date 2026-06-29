@@ -36,9 +36,9 @@ const BY_EXT: Record<string, FIcon> = {
   yml: { glyph: "YA", cls: "fi-data" },
   yaml: { glyph: "YA", cls: "fi-data" },
   toml: { glyph: "TO", cls: "fi-data" },
-  ini: { glyph: "⚙", cls: "fi-data" },
-  conf: { glyph: "⚙", cls: "fi-data" },
-  cfg: { glyph: "⚙", cls: "fi-data" },
+  ini: { glyph: "INI", cls: "fi-data" },
+  conf: { glyph: "CFG", cls: "fi-data" },
+  cfg: { glyph: "CFG", cls: "fi-data" },
   xml: { glyph: "<>", cls: "fi-data" },
   lock: { glyph: "⊘", cls: "fi-data" },
   sql: { glyph: "DB", cls: "fi-data" },
@@ -75,7 +75,7 @@ const BY_NAME: Record<string, FIcon> = {
 export function fileIcon(name: string): FIcon {
   const lower = name.toLowerCase();
   if (BY_NAME[lower]) return BY_NAME[lower]!;
-  if (lower.startsWith(".env")) return { glyph: "⚙", cls: "fi-data" };
+  if (lower.startsWith(".env")) return { glyph: "ENV", cls: "fi-data" };
   const dot = lower.lastIndexOf(".");
   const ext = dot > 0 ? lower.slice(dot + 1) : "";
   return BY_EXT[ext] ?? { glyph: "·", cls: "fi-default" };

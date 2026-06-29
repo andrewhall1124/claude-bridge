@@ -13,7 +13,7 @@ const MODES: { value: PermissionMode; abbr: string; title: string }[] = [
   { value: "plan", abbr: "PLAN", title: "Plan — explore only, no changes" },
   { value: "default", abbr: "ASK", title: "Ask before edits & commands" },
   { value: "acceptEdits", abbr: "EDIT", title: "Auto-approve file edits" },
-  { value: "bypassPermissions", abbr: "BYPASS", title: "Run everything unprompted ⚠" },
+  { value: "bypassPermissions", abbr: "BYPASS", title: "Run everything unprompted" },
 ];
 
 const MODE_ABBR: Record<PermissionMode, string> = {
@@ -264,7 +264,7 @@ export function ChatPane({
             ))}
             {uploading && <span className="attach-chip subtle">uploading…</span>}
             {uploadError && (
-              <span className="system-line error">⚠ {uploadError}</span>
+              <span className="system-line error">{uploadError}</span>
             )}
           </div>
         )}
@@ -283,11 +283,11 @@ export function ChatPane({
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
           >
-            📎
+            +
           </button>
           <textarea
             value={text}
-            placeholder="Message Claude… (Enter to send, Shift+Enter for newline · drag/paste files to attach)"
+            placeholder="Message Claude…"
             onChange={(e) => setText(e.target.value)}
             onKeyDown={onKeyDown}
             onPaste={onPaste}

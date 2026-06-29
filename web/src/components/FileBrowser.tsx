@@ -174,7 +174,7 @@ export function FileBrowser({ repoId }: Props) {
   return (
     <div className="file-browser">
       <div className="file-tree">
-        {error && <div className="system-line error">⚠ {error}</div>}
+        {error && <div className="system-line error">{error}</div>}
         {renderDir("", 0)}
       </div>
       <div className="file-view">

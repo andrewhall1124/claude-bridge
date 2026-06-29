@@ -9,7 +9,7 @@ const MODE_OPTIONS: { value: PermissionMode; label: string }[] = [
   { value: "plan", label: "plan — explore only, no execution" },
   {
     value: "bypassPermissions",
-    label: "bypassPermissions — run everything unprompted ⚠",
+    label: "bypassPermissions — run everything unprompted",
   },
 ];
 
@@ -49,7 +49,7 @@ export function Settings() {
   if (loading) return <div className="pane subtle">Loading settings…</div>;
   if (!settings)
     return (
-      <div className="pane system-line error">⚠ {error ?? "No settings."}</div>
+      <div className="pane system-line error">{error ?? "No settings."}</div>
     );
 
   return (
@@ -103,7 +103,7 @@ export function Settings() {
         </select>
         {settings.defaultPermissionMode === "bypassPermissions" && (
           <span className="system-line error" style={{ marginTop: 6 }}>
-            ⚠ bypassPermissions lets the agent read, write, and run anything in
+            bypassPermissions lets the agent read, write, and run anything in
             new sessions without asking. Only use this on a trusted, tailnet-only
             box. Applies to sessions created after saving.
           </span>
@@ -119,7 +119,7 @@ export function Settings() {
           {saving ? "Saving…" : "Save"}
         </button>
         {status && <span className="subtle">{status}</span>}
-        {error && <span className="system-line error">⚠ {error}</span>}
+        {error && <span className="system-line error">{error}</span>}
       </div>
     </div>
   );

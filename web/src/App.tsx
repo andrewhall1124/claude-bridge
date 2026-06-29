@@ -12,11 +12,11 @@ import { Settings } from "./components/Settings";
 
 type Tab = "chat" | "code" | "deploy" | "settings";
 
-const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: "chat", label: "Chat", icon: "💬" },
-  { id: "code", label: "Code", icon: "📁" },
-  { id: "deploy", label: "Deploy", icon: "🚀" },
-  { id: "settings", label: "Settings", icon: "⚙️" },
+const TABS: { id: Tab; label: string }[] = [
+  { id: "chat", label: "Chat" },
+  { id: "code", label: "Code" },
+  { id: "deploy", label: "Deploy" },
+  { id: "settings", label: "Settings" },
 ];
 
 function useMediaQuery(query: string): boolean {
@@ -343,7 +343,6 @@ export function App() {
               className={`bottom-tab ${tab === t.id ? "active" : ""}`}
               onClick={() => setTab(t.id)}
             >
-              <span className="bottom-tab-icon">{t.icon}</span>
               <span className="bottom-tab-label">{t.label}</span>
             </button>
           ))}

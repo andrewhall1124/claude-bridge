@@ -180,7 +180,7 @@ RAILWAY_ENVIRONMENT=production`}</pre>
           Pick the Railway project for this repo. The Deploy page then shows that
           project's services whenever this repo is selected.
         </p>
-        {error && <div className="system-line error">⚠ {error}</div>}
+        {error && <div className="system-line error">{error}</div>}
         <div className="deploy-link-row">
           <select
             value={pick || linkedProject || ""}
@@ -263,7 +263,7 @@ RAILWAY_ENVIRONMENT=production`}</pre>
         </button>
       </div>
 
-      {error && <div className="system-line error deploy-error">⚠ {error}</div>}
+      {error && <div className="system-line error deploy-error">{error}</div>}
 
       {status && (
         <div className="deploy-table">

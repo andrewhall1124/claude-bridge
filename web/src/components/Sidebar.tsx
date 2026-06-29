@@ -66,7 +66,7 @@ export function Sidebar({
                   aria-label="Rename repo"
                   onClick={() => onRenameRepo(r.id)}
                 >
-                  ✎
+                  ren
                 </button>
                 <button
                   className="icon-btn icon-btn-sm danger"
@@ -118,7 +118,7 @@ export function Sidebar({
                   aria-label="Rename session"
                   onClick={() => onRenameSession(s.id)}
                 >
-                  ✎
+                  ren
                 </button>
                 <button
                   className="icon-btn icon-btn-sm danger"
@@ -126,7 +126,7 @@ export function Sidebar({
                   aria-label="Delete session"
                   onClick={() => onDeleteSession(s.id)}
                 >
-                  🗑
+                  ✕
                 </button>
               </div>
             </li>

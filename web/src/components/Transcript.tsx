@@ -128,27 +128,6 @@ export function pendingToolName(items: TranscriptItem[]): string | null {
 }
 
 // ---- per-tool presentation ----------------------------------------------
-const TOOL_ICONS: Record<string, string> = {
-  Read: "📄",
-  Write: "🆕",
-  Edit: "✏️",
-  MultiEdit: "✏️",
-  NotebookEdit: "📓",
-  Bash: "⚡",
-  Glob: "🔎",
-  Grep: "🔍",
-  WebFetch: "🌐",
-  WebSearch: "🌐",
-  Task: "🤖",
-  Agent: "🤖",
-  TodoWrite: "✅",
-  AskUserQuestion: "❓",
-};
-
-function toolIcon(name: string): string {
-  return TOOL_ICONS[name] ?? "🔧";
-}
-
 function str(v: unknown): string {
   return typeof v === "string" ? v : "";
 }
@@ -230,7 +209,6 @@ function ToolView({ node }: { node: ToolNode }) {
   return (
     <div className={`tool-node ${status}`}>
       <button className="tool-node-head" onClick={() => setOpen((o) => !o)}>
-        <span className="tool-node-icon">{toolIcon(node.name)}</span>
         <span className="tool-node-name">{displayName}</span>
         <span className="tool-node-summary">{summary}</span>
         {statusIcon}
@@ -265,7 +243,6 @@ function ThinkingView({ text }: { text: string }) {
   return (
     <div className="think-node">
       <button className="think-node-head" onClick={() => setOpen((o) => !o)}>
-        <span className="think-icon">💭</span>
         <span className="think-label">thinking</span>
         {!open && <span className="think-preview">{clip(text, 80)}</span>}
         <span className="tool-toggle">{open ? "▾" : "▸"}</span>
@@ -303,7 +280,6 @@ function ToolGroup({ tools }: { tools: ToolNode[] }) {
   return (
     <div className={`toolgroup ${running ? "running" : errored ? "error" : "done"}`}>
       <button className="toolgroup-head" onClick={() => setOpen((o) => !o)}>
-        <span className="tool-node-icon">🛠</span>
         <span className="tool-node-name">working</span>
         <span className="toolgroup-count">{tools.length} steps</span>
         {!open && <span className="tool-node-summary">{summary}</span>}
@@ -382,7 +358,7 @@ export function Transcript({ items }: { items: TranscriptItem[] }) {
           case "error":
             return (
               <div key={n.key} className="system-line error">
-                ⚠ {n.message}
+                {n.message}
               </div>
             );
           default:

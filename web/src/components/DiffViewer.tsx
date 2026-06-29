@@ -93,7 +93,7 @@ export function DiffViewer({ repoId }: Props) {
   if (loading) return <div className="subtle">Loading diff…</div>;
   if (notGit)
     return <div className="empty-state subtle">This repo is not a git repository.</div>;
-  if (error) return <div className="system-line error">⚠ {error}</div>;
+  if (error) return <div className="system-line error">{error}</div>;
   if (!diff) return null;
 
   const hasChanges =

@@ -2040,3 +2040,44 @@ body::after {
   font-size: 16px;
   line-height: 1;
 }
+
+/* ---------- mobile + chat overflow hardening ---------- */
+/* Keep the chat from growing the page horizontally: the min-width:0 chain lets
+   inner <pre>/<table> scroll internally instead of widening the layout. */
+.chat-scroll {
+  overflow-x: hidden;
+}
+.bubble {
+  min-width: 0;
+}
+.bubble.assistant {
+  min-width: 0;
+}
+.bubble .md,
+.md pre,
+.md table {
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  /* Permission-mode selector spans the full width, chips share it evenly. */
+  .chat-input-controls {
+    flex-wrap: wrap;
+  }
+  .mode-seg {
+    width: 100%;
+  }
+  .mode-chip {
+    flex: 1 1 0;
+    text-align: center;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+  /* A touch more room for messages on small screens. */
+  .chat-scroll {
+    padding: 10px;
+  }
+  .bubble {
+    max-width: 92%;
+  }
+}

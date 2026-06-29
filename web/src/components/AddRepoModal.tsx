@@ -129,7 +129,7 @@ export function AddRepoModal({ onClose, onAdded }: Props) {
           />
         </label>
 
-        {error && <div className="system-line error modal-error">⚠ {error}</div>}
+        {error && <div className="system-line error modal-error">{error}</div>}
 
         <div className="modal-actions">
           <button className="btn btn-primary" onClick={submit} disabled={busy}>
