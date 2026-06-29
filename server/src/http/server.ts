@@ -13,6 +13,7 @@ import { closeSession } from "../agent/sessionManager.js";
 import * as git from "../git/repo.js";
 import * as railway from "../railway/client.js";
 import { getConfig } from "../config.js";
+import * as userClaude from "../userClaude.js";
 import { randomSessionName } from "../names.js";
 import type { PermissionMode, Repo, Settings } from "../protocol.js";
 
@@ -165,6 +166,48 @@ export async function buildServer(): Promise<FastifyInstance> {
     )
       patch.defaultPermissionMode = body.defaultPermissionMode as PermissionMode;
     return dbm.updateSettings(patch);
+  });
+
+  // ---- User-level Claude config (MCP servers, CLAUDE.md, hooks) ----------
+  // These read/write the real ~/.claude files shared with the `claude` CLI.
+  app.get("/api/user/mcp", async () => ({ servers: userClaude.readUserMcpServers() }));
+
+  app.put<{ Body: { servers?: unknown } }>("/api/user/mcp", async (req, reply) => {
+    try {
+      const servers = userClaude.validateMcpServers(req.body?.servers ?? {});
+      userClaude.writeUserMcpServers(servers);
+      return { servers };
+    } catch (err) {
+      return reply.code(400).send({ error: errMsg(err) });
+    }
+  });
+
+  app.get("/api/user/claude-md", async () => ({ content: userClaude.readClaudeMd() }));
+
+  app.put<{ Body: { content?: string } }>("/api/user/claude-md", async (req, reply) => {
+    const content = req.body?.content;
+    if (typeof content !== "string")
+      return reply.code(400).send({ error: "content must be a string" });
+    try {
+      userClaude.writeClaudeMd(content);
+      return { content };
+    } catch (err) {
+      return reply.code(400).send({ error: errMsg(err) });
+    }
+  });
+
+  app.get("/api/user/hooks", async () => ({ hooks: userClaude.readHooks() }));
+
+  app.put<{ Body: { hooks?: unknown } }>("/api/user/hooks", async (req, reply) => {
+    const hooks = req.body?.hooks;
+    if (!hooks || typeof hooks !== "object" || Array.isArray(hooks))
+      return reply.code(400).send({ error: "hooks must be a JSON object" });
+    try {
+      userClaude.writeHooks(hooks as Record<string, unknown>);
+      return { hooks: userClaude.readHooks() };
+    } catch (err) {
+      return reply.code(400).send({ error: errMsg(err) });
+    }
   });
 
   // Sessions

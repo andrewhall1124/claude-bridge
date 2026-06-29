@@ -5,6 +5,7 @@ import type {
   DiffResult,
   FileContent,
   FileListing,
+  McpServerConfig,
   NotGitResult,
   RailwayConfig,
   RailwayProject,
@@ -79,6 +80,27 @@ export const api = {
     request<Settings>("/api/settings", {
       method: "PUT",
       body: JSON.stringify(patch),
+    }),
+
+  // User-level Claude config
+  getUserMcp: () =>
+    request<{ servers: Record<string, McpServerConfig> }>("/api/user/mcp"),
+  putUserMcp: (servers: Record<string, McpServerConfig>) =>
+    request<{ servers: Record<string, McpServerConfig> }>("/api/user/mcp", {
+      method: "PUT",
+      body: JSON.stringify({ servers }),
+    }),
+  getUserClaudeMd: () => request<{ content: string }>("/api/user/claude-md"),
+  putUserClaudeMd: (content: string) =>
+    request<{ content: string }>("/api/user/claude-md", {
+      method: "PUT",
+      body: JSON.stringify({ content }),
+    }),
+  getUserHooks: () => request<{ hooks: Record<string, unknown> }>("/api/user/hooks"),
+  putUserHooks: (hooks: Record<string, unknown>) =>
+    request<{ hooks: Record<string, unknown> }>("/api/user/hooks", {
+      method: "PUT",
+      body: JSON.stringify({ hooks }),
     }),
 
   getSessions: () => request<{ sessions: SessionMeta[] }>("/api/sessions"),

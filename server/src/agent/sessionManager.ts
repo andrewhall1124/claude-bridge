@@ -9,6 +9,7 @@ import type {
 } from "@anthropic-ai/claude-agent-sdk";
 import { AsyncQueue } from "../util/asyncQueue.js";
 import { getConfig } from "../config.js";
+import { readUserMcpServers } from "../userClaude.js";
 import { log } from "../logger.js";
 import { emitSession } from "../bus.js";
 import * as dbm from "../db.js";
@@ -291,7 +292,14 @@ function startSession(sessionId: string): ActiveSession {
     cwd: repo.path,
     model: settings.defaultModel,
     permissionMode: sdkPermissionMode(permissionMode),
-    mcpServers: config.mcpServers,
+    // Load the user/project/local filesystem settings (this is the SDK default
+    // when omitted, but we set it explicitly so user-level CLAUDE.md and hooks
+    // — editable from Settings — are guaranteed to apply.
+    settingSources: ["user", "project", "local"],
+    // Bridge's own config.json servers plus the user-scope MCP servers managed
+    // from Settings (~/.claude.json). Read fresh per session so edits take
+    // effect for new sessions without a restart.
+    mcpServers: { ...config.mcpServers, ...readUserMcpServers() },
     // The SDK requires this opt-in before bypassPermissions can take effect.
     // We enable it for chat sessions so the owner can switch a live session
     // into bypass from the UI. It is only a *precondition* — it never bypasses

@@ -117,6 +117,22 @@ export interface Settings {
   defaultPermissionMode: PermissionMode;
 }
 
+// ---- User-level Claude config (managed via Settings) ----
+// A subset of the Agent SDK's MCP server shapes that the UI can edit. Stored in
+// ~/.claude.json under `mcpServers`.
+export interface McpStdioServer {
+  type?: "stdio";
+  command: string;
+  args?: string[];
+  env?: Record<string, string>;
+}
+export interface McpHttpServer {
+  type: "http" | "sse";
+  url: string;
+  headers?: Record<string, string>;
+}
+export type McpServerConfig = McpStdioServer | McpHttpServer;
+
 // ---- AskUserQuestion tool ----
 export interface QuestionOption {
   label: string;
