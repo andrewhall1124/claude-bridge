@@ -202,3 +202,52 @@ export async function getProjectStatus(
     services,
   };
 }
+
+// ---- Service environment variables ---------------------------------------
+
+// Variables for a service in an environment. `unrendered` keeps ${{...}}
+// references intact so editing doesn't bake a resolved value into the var.
+export async function listVariables(
+  token: string,
+  projectId: string,
+  environmentId: string,
+  serviceId: string,
+): Promise<Record<string, string>> {
+  const data = await gql<{ variables: Record<string, string> }>(
+    token,
+    `query vars($projectId: String!, $environmentId: String!, $serviceId: String) {
+       variables(projectId: $projectId, environmentId: $environmentId, serviceId: $serviceId, unrendered: true)
+     }`,
+    { projectId, environmentId, serviceId },
+  );
+  return data.variables ?? {};
+}
+
+export async function upsertVariable(
+  token: string,
+  projectId: string,
+  environmentId: string,
+  serviceId: string,
+  name: string,
+  value: string,
+): Promise<void> {
+  await gql(
+    token,
+    `mutation upsert($input: VariableUpsertInput!) { variableUpsert(input: $input) }`,
+    { input: { projectId, environmentId, serviceId, name, value } },
+  );
+}
+
+export async function deleteVariable(
+  token: string,
+  projectId: string,
+  environmentId: string,
+  serviceId: string,
+  name: string,
+): Promise<void> {
+  await gql(
+    token,
+    `mutation del($input: VariableDeleteInput!) { variableDelete(input: $input) }`,
+    { input: { projectId, environmentId, serviceId, name } },
+  );
+}

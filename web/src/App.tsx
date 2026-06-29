@@ -131,7 +131,8 @@ export function App() {
   function selectRepo(id: string) {
     setSelectedRepoId(id);
     setSelectedSessionId(null);
-    setSidebarOpen(false);
+    // Keep the drawer open on mobile so repo -> session is one fluid step;
+    // picking a session (or creating one) is what closes it.
   }
 
   function onRepoAdded(repo: Repo) {

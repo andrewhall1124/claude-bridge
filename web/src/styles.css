@@ -1890,9 +1890,13 @@ body::after {
   font-size: 12px;
   text-align: right;
 }
-.dep-link-col {
-  flex: 0 0 24px;
-  text-align: center;
+.dep-actions-col {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 84px;
 }
 .dep-link {
   color: var(--accent);
@@ -2079,5 +2083,93 @@ body::after {
   }
   .bubble {
     max-width: 92%;
+  }
+}
+
+/* ---------- variables modal ---------- */
+.vars-modal {
+  max-width: 640px;
+}
+.vars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 55vh;
+  overflow: auto;
+}
+.var-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.var-name {
+  flex: 0 0 32%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--accent-2);
+}
+.var-value {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.var-name-input {
+  flex: 0 0 32%;
+  min-width: 0;
+}
+.var-add {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.vars-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+}
+
+/* ---------- Deploy page on mobile ---------- */
+@media (max-width: 600px) {
+  .deploy-toolbar {
+    flex-wrap: wrap;
+    gap: 8px 10px;
+  }
+  .deploy-field select {
+    max-width: 160px;
+  }
+  /* Stack each service into a card; drop the table header. */
+  .dep-head {
+    display: none;
+  }
+  .dep-row {
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 4px;
+    padding: 10px 12px;
+  }
+  .dep-svc {
+    flex: 1 1 auto;
+  }
+  .dep-badge-col {
+    flex: 0 0 auto;
+  }
+  .dep-commit {
+    flex: 1 1 100%;
+    order: 3;
+  }
+  .dep-time {
+    flex: 1 1 auto;
+    order: 4;
+    text-align: left;
+  }
+  .dep-actions-col {
+    order: 4;
+    flex: 0 0 auto;
+  }
+  .var-name,
+  .var-name-input {
+    flex-basis: 40%;
   }
 }

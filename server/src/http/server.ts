@@ -397,6 +397,93 @@ export async function buildServer(): Promise<FastifyInstance> {
     },
   );
 
+  // Railway service environment variables.
+  function railwayToken(reply: import("fastify").FastifyReply): string | null {
+    const cfg = getConfig();
+    if (!cfg.railwayApiToken) {
+      reply.code(400).send({ error: "Railway is not configured" });
+      return null;
+    }
+    return cfg.railwayApiToken;
+  }
+
+  app.get<{
+    Querystring: { project?: string; environmentId?: string; service?: string };
+  }>("/api/railway/variables", async (req, reply) => {
+    const token = railwayToken(reply);
+    if (!token) return;
+    const { project, environmentId, service } = req.query;
+    if (!project || !environmentId || !service)
+      return reply
+        .code(400)
+        .send({ error: "project, environmentId and service are required" });
+    try {
+      const variables = await railway.listVariables(
+        token,
+        project,
+        environmentId,
+        service,
+      );
+      return { variables };
+    } catch (err) {
+      return reply.code(502).send({ error: errMsg(err) });
+    }
+  });
+
+  app.put<{
+    Body: {
+      project?: string;
+      environmentId?: string;
+      service?: string;
+      name?: string;
+      value?: string;
+    };
+  }>("/api/railway/variables", async (req, reply) => {
+    const token = railwayToken(reply);
+    if (!token) return;
+    const { project, environmentId, service, name, value } = req.body ?? {};
+    if (!project || !environmentId || !service || !name)
+      return reply
+        .code(400)
+        .send({ error: "project, environmentId, service and name are required" });
+    try {
+      await railway.upsertVariable(
+        token,
+        project,
+        environmentId,
+        service,
+        name,
+        value ?? "",
+      );
+      return { ok: true };
+    } catch (err) {
+      return reply.code(502).send({ error: errMsg(err) });
+    }
+  });
+
+  app.delete<{
+    Body: {
+      project?: string;
+      environmentId?: string;
+      service?: string;
+      name?: string;
+    };
+  }>("/api/railway/variables", async (req, reply) => {
+    const token = railwayToken(reply);
+    if (!token) return;
+    const { project, environmentId, service, name } = req.body ?? {};
+    if (!project || !environmentId || !service || !name)
+      return reply
+        .code(400)
+        .send({ error: "project, environmentId, service and name are required" });
+    try {
+      await railway.deleteVariable(token, project, environmentId, service, name);
+      return { ok: true };
+    } catch (err) {
+      return reply.code(502).send({ error: errMsg(err) });
+    }
+  });
+
   // ---- Static PWA --------------------------------------------------------
   if (existsSync(WEB_DIST)) {
     await app.register(fastifyStatic, { root: WEB_DIST, wildcard: false });
