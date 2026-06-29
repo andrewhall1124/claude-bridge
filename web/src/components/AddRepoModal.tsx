@@ -27,7 +27,6 @@ const MODES: { value: AddRepoMode; label: string; hint: string }[] = [
 
 export function AddRepoModal({ onClose, onAdded }: Props) {
   const [mode, setMode] = useState<AddRepoMode>("existing");
-  const [name, setName] = useState("");
   const [path, setPath] = useState("");
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
@@ -37,14 +36,12 @@ export function AddRepoModal({ onClose, onAdded }: Props) {
 
   async function submit() {
     setError(null);
-    if (!name.trim()) return setError("Name is required.");
     if (mode === "clone" && !url.trim()) return setError("Repository URL is required.");
     if (!path.trim()) return setError("Path is required.");
     setBusy(true);
     try {
       const res = await api.addRepo({
         mode,
-        name: name.trim(),
         path: path.trim() || undefined,
         url: url.trim() || undefined,
       });
@@ -87,18 +84,6 @@ export function AddRepoModal({ onClose, onAdded }: Props) {
         </div>
         <p className="subtle modal-hint">{hint}</p>
 
-        <label className="field">
-          <span>Name</span>
-          <input
-            type="text"
-            value={name}
-            placeholder="My project"
-            onChange={(e) => setName(e.target.value)}
-            disabled={busy}
-            autoFocus
-          />
-        </label>
-
         {mode === "clone" && (
           <label className="field">
             <span>Repository URL</span>
@@ -126,6 +111,7 @@ export function AddRepoModal({ onClose, onAdded }: Props) {
             placeholder="/srv/repos/my-project  (or ~/code/my-project)"
             onChange={(e) => setPath(e.target.value)}
             disabled={busy}
+            autoFocus
           />
         </label>
 

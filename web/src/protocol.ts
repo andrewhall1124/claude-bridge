@@ -252,7 +252,6 @@ export type AddRepoMode = "existing" | "init" | "clone";
 
 export interface AddRepoRequest {
   mode: AddRepoMode;
-  name: string;
   path?: string;
   url?: string;
 }

@@ -131,12 +131,6 @@ export function deleteRepo(id: string): void {
   db.prepare(`DELETE FROM repos WHERE id = ?`).run(id);
 }
 
-// Rename a repo's display name. A config-defined repo reverts to its config
-// name on next boot via syncRepos.
-export function renameRepo(id: string, name: string): void {
-  db.prepare(`UPDATE repos SET name = ? WHERE id = ?`).run(name, id);
-}
-
 // Link (or unlink, with null) a repo to a Railway project for the Deploy page.
 export function setRepoRailway(id: string, railwayProjectId: string | null): void {
   db.prepare(`UPDATE repos SET railway_project_id = ? WHERE id = ?`).run(

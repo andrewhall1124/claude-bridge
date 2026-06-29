@@ -11,7 +11,6 @@ interface Props {
   onRenameSession: (id: string) => void;
   onDeleteSession: (id: string) => void;
   onAddRepo: () => void;
-  onRenameRepo: (id: string) => void;
   onRemoveRepo: (id: string) => void;
   creating: boolean;
 }
@@ -27,7 +26,6 @@ export function Sidebar({
   onRenameSession,
   onDeleteSession,
   onAddRepo,
-  onRenameRepo,
   onRemoveRepo,
   creating,
 }: Props) {
@@ -60,14 +58,6 @@ export function Sidebar({
                 <span className="session-title">{r.name}</span>
               </button>
               <div className="session-actions">
-                <button
-                  className="icon-btn icon-btn-sm"
-                  title="Rename repo"
-                  aria-label="Rename repo"
-                  onClick={() => onRenameRepo(r.id)}
-                >
-                  ren
-                </button>
                 <button
                   className="icon-btn icon-btn-sm danger"
                   title="Remove repo (keeps files on disk)"

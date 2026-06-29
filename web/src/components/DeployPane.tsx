@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../api";
-import { VariablesModal } from "./VariablesModal";
 import type {
   RailwayConfig,
   RailwayProject,
@@ -61,7 +60,6 @@ export function DeployPane({ repoId, repos, onReposChanged }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<number | null>(null);
-  const [varsFor, setVarsFor] = useState<{ id: string; name: string } | null>(null);
 
   const repo = useMemo(
     () => repos.find((r) => r.id === repoId) ?? null,
@@ -285,20 +283,7 @@ export function DeployPane({ repoId, repos, onReposChanged }: Props) {
               ? `https://${d.staticUrl.replace(/^https?:\/\//, "")}`
               : d?.url ?? null;
             return (
-              <div
-                className="dep-row clickable"
-                key={s.id}
-                role="button"
-                tabIndex={0}
-                title="Edit environment variables"
-                onClick={() => setVarsFor({ id: s.id, name: s.name })}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setVarsFor({ id: s.id, name: s.name });
-                  }
-                }}
-              >
+              <div className="dep-row" key={s.id}>
                 <span className="dep-svc" title={s.name}>
                   {s.name}
                 </span>
@@ -341,23 +326,11 @@ export function DeployPane({ repoId, repos, onReposChanged }: Props) {
                       ↗
                     </a>
                   )}
-                  <span className="dep-vars">Env vars ›</span>
                 </span>
               </div>
             );
           })}
         </div>
-      )}
-
-      {varsFor && status && (
-        <VariablesModal
-          project={status.projectId}
-          environmentId={status.environment.id}
-          service={varsFor.id}
-          serviceName={varsFor.name}
-          envName={status.environment.name}
-          onClose={() => setVarsFor(null)}
-        />
       )}
     </div>
   );

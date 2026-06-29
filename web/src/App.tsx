@@ -158,20 +158,6 @@ export function App() {
     setSelectedSessionId(null);
   }
 
-  async function renameRepo(id: string) {
-    const repo = repos.find((r) => r.id === id);
-    const next = window.prompt("Rename repo", repo?.name ?? "");
-    if (next == null) return;
-    const name = next.trim();
-    if (!name || name === repo?.name) return;
-    try {
-      await api.renameRepo(id, name);
-      await loadRepos();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : String(err));
-    }
-  }
-
   async function removeRepo(id: string) {
     const repo = repos.find((r) => r.id === id);
     if (
@@ -337,7 +323,6 @@ export function App() {
             onRenameSession={renameSession}
             onDeleteSession={deleteSession}
             onAddRepo={() => setAddRepoOpen(true)}
-            onRenameRepo={renameRepo}
             onRemoveRepo={removeRepo}
             creating={creating}
           />

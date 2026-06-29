@@ -64,11 +64,6 @@ export const api = {
       method: "POST",
       body: JSON.stringify(req),
     }),
-  renameRepo: (id: string, name: string) =>
-    request<{ repo: Repo }>(`/api/repos/${encodeURIComponent(id)}`, {
-      method: "PATCH",
-      body: JSON.stringify({ name }),
-    }),
   setRepoRailway: (id: string, railwayProjectId: string | null) =>
     request<{ repo: Repo }>(`/api/repos/${encodeURIComponent(id)}`, {
       method: "PATCH",
@@ -178,31 +173,4 @@ export const api = {
     const suffix = qs.toString() ? `?${qs}` : "";
     return request<RailwayStatus>(`/api/railway/status${suffix}`);
   },
-  getRailwayVariables: (project: string, environmentId: string, service: string) => {
-    const qs = new URLSearchParams({ project, environmentId, service });
-    return request<{ variables: Record<string, string> }>(
-      `/api/railway/variables?${qs}`
-    );
-  },
-  setRailwayVariable: (
-    project: string,
-    environmentId: string,
-    service: string,
-    name: string,
-    value: string
-  ) =>
-    request<{ ok: true }>("/api/railway/variables", {
-      method: "PUT",
-      body: JSON.stringify({ project, environmentId, service, name, value }),
-    }),
-  deleteRailwayVariable: (
-    project: string,
-    environmentId: string,
-    service: string,
-    name: string
-  ) =>
-    request<{ ok: true }>("/api/railway/variables", {
-      method: "DELETE",
-      body: JSON.stringify({ project, environmentId, service, name }),
-    }),
 };

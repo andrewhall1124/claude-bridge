@@ -687,14 +687,10 @@ select:focus {
   gap: 8px;
 }
 
-/* Mode selector sits as its own full-width row above the composer. */
+/* Mode selector sits in its own row above the composer. On desktop it keeps
+   its natural width, left-aligned; on mobile it stretches full-width (below). */
 .mode-seg-top {
-  display: flex;
-  width: 100%;
-}
-.mode-seg-top .mode-chip {
-  flex: 1 1 0;
-  text-align: center;
+  align-self: flex-start;
 }
 
 /* Unified composer: text on top, a slim control bar beneath (mode left,
@@ -1970,18 +1966,6 @@ body::after {
   text-decoration: none;
   font-size: 14px;
 }
-.dep-row.clickable {
-  cursor: pointer;
-}
-.dep-row.clickable:hover {
-  background: var(--bg-2);
-}
-.dep-vars {
-  color: var(--accent);
-  font-size: 12px;
-  white-space: nowrap;
-  flex: 0 0 auto;
-}
 .dep-badge {
   display: inline-block;
   font-size: 11px;
@@ -2143,6 +2127,15 @@ body::after {
 }
 
 @media (max-width: 600px) {
+  /* On mobile the mode selector stretches full-width above the composer. */
+  .mode-seg-top {
+    display: flex;
+    width: 100%;
+  }
+  .mode-seg-top .mode-chip {
+    flex: 1 1 0;
+    text-align: center;
+  }
   /* Keep the composer controls on one slim row; tighten the mode chips to fit
      alongside attach + send. */
   .composer-bar {
@@ -2165,50 +2158,6 @@ body::after {
   .bubble {
     max-width: 92%;
   }
-}
-
-/* ---------- variables modal ---------- */
-.vars-modal {
-  max-width: 640px;
-}
-.vars-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-height: 55vh;
-  overflow: auto;
-}
-.var-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.var-name {
-  flex: 0 0 32%;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: var(--font-mono);
-  font-size: 12.5px;
-  color: var(--accent-2);
-}
-.var-value {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-.var-name-input {
-  flex: 0 0 32%;
-  min-width: 0;
-}
-.var-add {
-  margin-top: 4px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
-}
-.vars-note {
-  margin: 8px 0 0;
-  font-size: 12px;
 }
 
 /* ---------- Deploy page on mobile ---------- */
@@ -2248,10 +2197,6 @@ body::after {
   .dep-actions-col {
     order: 4;
     flex: 0 0 auto;
-  }
-  .var-name,
-  .var-name-input {
-    flex-basis: 40%;
   }
 }
 

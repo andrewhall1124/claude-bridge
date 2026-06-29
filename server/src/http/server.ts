@@ -83,12 +83,10 @@ export async function buildServer(): Promise<FastifyInstance> {
   //   init     — create a new directory and `git init`
   //   clone    — `git clone <url>` into the destination path
   app.post<{
-    Body: { mode?: "existing" | "init" | "clone"; name?: string; path?: string; url?: string };
+    Body: { mode?: "existing" | "init" | "clone"; path?: string; url?: string };
   }>("/api/repos", async (req, reply) => {
     const body = req.body ?? {};
-    const name = body.name?.trim();
     const mode = body.mode ?? "existing";
-    if (!name) return reply.code(400).send({ error: "name is required" });
 
     try {
       let absPath: string;
@@ -115,6 +113,7 @@ export async function buildServer(): Promise<FastifyInstance> {
             .send({ error: `Path does not exist or is not a directory: ${absPath}` });
       }
 
+      const name = basename(absPath);
       const repo: Repo = { id: uniqueRepoId(slugify(name)), name, path: absPath };
       dbm.addRepo(repo);
       emitGlobal({ type: "repos_changed" });
@@ -125,28 +124,18 @@ export async function buildServer(): Promise<FastifyInstance> {
     }
   });
 
-  // Update a repo: rename and/or set its linked Railway project.
+  // Update a repo: set its linked Railway project.
   app.patch<{
     Params: { id: string };
-    Body: { name?: string; railwayProjectId?: string | null };
+    Body: { railwayProjectId?: string | null };
   }>("/api/repos/:id", async (req, reply) => {
     const repo = dbm.getRepo(req.params.id);
     if (!repo) return reply.code(404).send({ error: "Unknown repo" });
     const body = req.body ?? {};
-    let touched = false;
-    if (typeof body.name === "string") {
-      const name = body.name.trim();
-      if (!name) return reply.code(400).send({ error: "name cannot be empty" });
-      dbm.renameRepo(repo.id, name);
-      touched = true;
-    }
-    if (body.railwayProjectId !== undefined) {
-      const pid = body.railwayProjectId?.trim() || null;
-      dbm.setRepoRailway(repo.id, pid);
-      touched = true;
-    }
-    if (!touched)
+    if (body.railwayProjectId === undefined)
       return reply.code(400).send({ error: "Nothing to update" });
+    const pid = body.railwayProjectId?.trim() || null;
+    dbm.setRepoRailway(repo.id, pid);
     emitGlobal({ type: "repos_changed" });
     return { repo: dbm.getRepo(repo.id) };
   });
@@ -418,93 +407,6 @@ export async function buildServer(): Promise<FastifyInstance> {
       }
     },
   );
-
-  // Railway service environment variables.
-  function railwayToken(reply: import("fastify").FastifyReply): string | null {
-    const { token } = resolvedRailway();
-    if (!token) {
-      reply.code(400).send({ error: "Railway is not configured" });
-      return null;
-    }
-    return token;
-  }
-
-  app.get<{
-    Querystring: { project?: string; environmentId?: string; service?: string };
-  }>("/api/railway/variables", async (req, reply) => {
-    const token = railwayToken(reply);
-    if (!token) return;
-    const { project, environmentId, service } = req.query;
-    if (!project || !environmentId || !service)
-      return reply
-        .code(400)
-        .send({ error: "project, environmentId and service are required" });
-    try {
-      const variables = await railway.listVariables(
-        token,
-        project,
-        environmentId,
-        service,
-      );
-      return { variables };
-    } catch (err) {
-      return reply.code(502).send({ error: errMsg(err) });
-    }
-  });
-
-  app.put<{
-    Body: {
-      project?: string;
-      environmentId?: string;
-      service?: string;
-      name?: string;
-      value?: string;
-    };
-  }>("/api/railway/variables", async (req, reply) => {
-    const token = railwayToken(reply);
-    if (!token) return;
-    const { project, environmentId, service, name, value } = req.body ?? {};
-    if (!project || !environmentId || !service || !name)
-      return reply
-        .code(400)
-        .send({ error: "project, environmentId, service and name are required" });
-    try {
-      await railway.upsertVariable(
-        token,
-        project,
-        environmentId,
-        service,
-        name,
-        value ?? "",
-      );
-      return { ok: true };
-    } catch (err) {
-      return reply.code(502).send({ error: errMsg(err) });
-    }
-  });
-
-  app.delete<{
-    Body: {
-      project?: string;
-      environmentId?: string;
-      service?: string;
-      name?: string;
-    };
-  }>("/api/railway/variables", async (req, reply) => {
-    const token = railwayToken(reply);
-    if (!token) return;
-    const { project, environmentId, service, name } = req.body ?? {};
-    if (!project || !environmentId || !service || !name)
-      return reply
-        .code(400)
-        .send({ error: "project, environmentId, service and name are required" });
-    try {
-      await railway.deleteVariable(token, project, environmentId, service, name);
-      return { ok: true };
-    } catch (err) {
-      return reply.code(502).send({ error: errMsg(err) });
-    }
-  });
 
   // ---- Static PWA --------------------------------------------------------
   if (existsSync(WEB_DIST)) {
