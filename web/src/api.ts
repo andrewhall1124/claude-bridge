@@ -73,6 +73,15 @@ export const api = {
     request<{ session: SessionMeta; transcript: TranscriptItem[] }>(
       `/api/sessions/${encodeURIComponent(id)}`
     ),
+  renameSession: (id: string, title: string) =>
+    request<{ session: SessionMeta }>(`/api/sessions/${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ title }),
+    }),
+  deleteSession: (id: string) =>
+    request<{ ok: true }>(`/api/sessions/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    }),
 
   getJobs: () => request<{ jobs: Job[] }>("/api/jobs"),
   createJob: (repoId: string, prompt: string) =>

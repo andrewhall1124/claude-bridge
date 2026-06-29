@@ -224,6 +224,16 @@ export function setSessionTitle(id: string, title: string): void {
   db.prepare(`UPDATE sessions SET title = ? WHERE id = ?`).run(title, id);
 }
 
+// Delete a session and its transcript. Jobs that referenced it keep their row
+// (their session_id simply points at a now-empty transcript).
+export function deleteSession(id: string): void {
+  const tx = db.transaction((sessionId: string) => {
+    db.prepare(`DELETE FROM messages WHERE session_id = ?`).run(sessionId);
+    db.prepare(`DELETE FROM sessions WHERE id = ?`).run(sessionId);
+  });
+  tx(id);
+}
+
 export function touchSession(id: string): void {
   db.prepare(`UPDATE sessions SET last_active_at = ? WHERE id = ?`).run(now(), id);
 }

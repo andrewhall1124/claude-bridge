@@ -303,6 +303,45 @@ select:focus {
   white-space: nowrap;
 }
 
+.session-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.session-row .session-item {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.session-actions {
+  display: flex;
+  gap: 0;
+  flex: 0 0 auto;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.session-row:hover .session-actions,
+.session-row:focus-within .session-actions {
+  opacity: 1;
+}
+.icon-btn-sm {
+  font-size: 14px;
+  padding: 4px 6px;
+  line-height: 1;
+  border-radius: 6px;
+}
+.icon-btn-sm:hover {
+  background: var(--bg-2);
+}
+.icon-btn-sm.danger:hover {
+  background: #3a1620;
+}
+/* On touch devices there's no hover — keep actions visible. */
+@media (hover: none) {
+  .session-actions {
+    opacity: 1;
+  }
+}
+
 .status-badge {
   font-size: 11px;
   padding: 2px 7px;

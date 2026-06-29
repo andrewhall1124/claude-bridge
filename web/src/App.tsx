@@ -113,6 +113,37 @@ export function App() {
     if (selectedSessionId) ws.setPermissionMode(selectedSessionId, mode);
   }
 
+  async function renameSession(id: string) {
+    const current = sessions.find((s) => s.id === id);
+    const next = window.prompt("Rename session", current?.title ?? "");
+    if (next == null) return;
+    const title = next.trim();
+    if (!title || title === current?.title) return;
+    try {
+      await api.renameSession(id, title);
+      await loadSessions();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  async function deleteSession(id: string) {
+    const current = sessions.find((s) => s.id === id);
+    if (
+      !window.confirm(
+        `Delete "${current?.title || "this session"}" and its transcript? This cannot be undone.`,
+      )
+    )
+      return;
+    try {
+      await api.deleteSession(id);
+      if (selectedSessionId === id) setSelectedSessionId(null);
+      await loadSessions();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : String(err));
+    }
+  }
+
   const connLabel =
     conn === "connected"
       ? "connected"
@@ -197,6 +228,8 @@ export function App() {
             onSelectRepo={selectRepo}
             onSelectSession={selectSession}
             onNewSession={newSession}
+            onRenameSession={renameSession}
+            onDeleteSession={deleteSession}
             creating={creating}
           />
         </div>

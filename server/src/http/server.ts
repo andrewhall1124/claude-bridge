@@ -5,6 +5,8 @@ import { dirname, resolve } from "node:path";
 import { existsSync } from "node:fs";
 import { log } from "../logger.js";
 import * as dbm from "../db.js";
+import { emitGlobal } from "../bus.js";
+import { closeSession } from "../agent/sessionManager.js";
 import { enqueue } from "../jobs/queue.js";
 import * as git from "../git/repo.js";
 import type { PermissionMode, Settings } from "../protocol.js";
@@ -70,6 +72,28 @@ export async function buildServer(): Promise<FastifyInstance> {
     const session = dbm.getSession(req.params.id);
     if (!session) return reply.code(404).send({ error: "Session not found" });
     return { session, transcript: dbm.getTranscript(session.id) };
+  });
+
+  app.patch<{ Params: { id: string }; Body: { title?: string } }>(
+    "/api/sessions/:id",
+    async (req, reply) => {
+      const session = dbm.getSession(req.params.id);
+      if (!session) return reply.code(404).send({ error: "Session not found" });
+      const title = req.body?.title?.trim();
+      if (!title) return reply.code(400).send({ error: "title is required" });
+      dbm.setSessionTitle(session.id, title);
+      emitGlobal({ type: "sessions_changed" });
+      return { session: dbm.getSession(session.id) };
+    },
+  );
+
+  app.delete<{ Params: { id: string } }>("/api/sessions/:id", async (req, reply) => {
+    const session = dbm.getSession(req.params.id);
+    if (!session) return reply.code(404).send({ error: "Session not found" });
+    closeSession(session.id);
+    dbm.deleteSession(session.id);
+    emitGlobal({ type: "sessions_changed" });
+    return { ok: true };
   });
 
   // Jobs

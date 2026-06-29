@@ -8,6 +8,8 @@ interface Props {
   onSelectRepo: (id: string) => void;
   onSelectSession: (id: string) => void;
   onNewSession: () => void;
+  onRenameSession: (id: string) => void;
+  onDeleteSession: (id: string) => void;
   creating: boolean;
 }
 
@@ -19,6 +21,8 @@ export function Sidebar({
   onSelectRepo,
   onSelectSession,
   onNewSession,
+  onRenameSession,
+  onDeleteSession,
   creating,
 }: Props) {
   const repoSessions = sessions.filter((s) => s.repoId === selectedRepoId);
@@ -65,7 +69,7 @@ export function Sidebar({
         )}
         <ul className="session-list">
           {repoSessions.map((s) => (
-            <li key={s.id}>
+            <li key={s.id} className="session-row">
               <button
                 className={`session-item ${
                   s.id === selectedSessionId ? "selected" : ""
@@ -75,6 +79,24 @@ export function Sidebar({
                 <span className="session-title">{s.title || "Untitled"}</span>
                 <span className={`status-badge ${s.status}`}>{s.status}</span>
               </button>
+              <div className="session-actions">
+                <button
+                  className="icon-btn icon-btn-sm"
+                  title="Rename session"
+                  aria-label="Rename session"
+                  onClick={() => onRenameSession(s.id)}
+                >
+                  ✎
+                </button>
+                <button
+                  className="icon-btn icon-btn-sm danger"
+                  title="Delete session"
+                  aria-label="Delete session"
+                  onClick={() => onDeleteSession(s.id)}
+                >
+                  🗑
+                </button>
+              </div>
             </li>
           ))}
         </ul>

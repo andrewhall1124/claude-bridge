@@ -215,7 +215,8 @@ in the Settings tab (stored in SQLite, seeded from config on first boot).
   SDK session id is persisted so a session can be **resumed** later (this powers live
   watch from a second device and resuming after the app was closed). Every SDK message
   (assistant text, tool calls/results, result) is streamed to all subscribed WebSocket
-  clients and appended to the SQLite transcript as it arrives.
+  clients and appended to the SQLite transcript as it arrives. Sessions can be renamed or
+  deleted from the sidebar (delete tears down the live agent and removes its transcript).
 - **Permissions:** chat sessions pass a `canUseTool` approval callback. When Claude wants
   to write/edit/run, the server emits an `approval_request` over the WebSocket and waits;
   the client shows Approve/Reject. Each session has a **permission-mode selector** in the

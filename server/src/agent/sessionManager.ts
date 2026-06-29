@@ -427,6 +427,24 @@ export function isActive(sessionId: string): boolean {
   return active.has(sessionId);
 }
 
+// Tear down a live agent for a session (e.g. before deleting it). Resolves any
+// pending approvals/questions so the SDK process can exit cleanly.
+export function closeSession(sessionId: string): void {
+  const sess = active.get(sessionId);
+  if (!sess) return;
+  active.delete(sessionId);
+  for (const p of sess.pending.values()) {
+    p.resolve({ behavior: "deny", message: "Session closed." });
+  }
+  sess.pending.clear();
+  try {
+    sess.input.close();
+    sess.query.close();
+  } catch (err) {
+    log.warn(`closeSession failed for ${sessionId}:`, err);
+  }
+}
+
 export async function closeAll(): Promise<void> {
   for (const sess of active.values()) {
     try {
