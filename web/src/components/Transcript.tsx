@@ -58,7 +58,7 @@ function buildNodes(items: TranscriptItem[]): Node[] {
         blocks.forEach((b, i) => {
           const key = `${item.id}:${i}`;
           if (b.type === "text") nodes.push({ kind: "text", key, text: b.text });
-          else if (b.type === "thinking")
+          else if (b.type === "thinking" && b.thinking)
             nodes.push({ kind: "thinking", key, text: b.thinking });
           else if (b.type === "tool_use") {
             const node: ToolNode = {

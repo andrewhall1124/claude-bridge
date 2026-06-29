@@ -179,7 +179,41 @@ async function consume(sessionId: string, q: Query): Promise<void> {
     });
   } finally {
     active.delete(sessionId);
+    thinkingBuffers.delete(sessionId);
   }
+}
+
+// The SDK delivers the final `assistant` message with thinking blocks stripped
+// to just their signature (empty `thinking` text). The actual reasoning text
+// only arrives via streamed `thinking_delta` events. We accumulate that text
+// here, keyed by content-block index, and merge it back into the assistant
+// content before persisting so the transcript's thinking view has something to
+// show. Keyed by sessionId; reset at each message boundary, cleared when the
+// session's stream ends.
+const thinkingBuffers = new Map<string, Map<number, string>>();
+
+function thinkingBuffer(sessionId: string): Map<number, string> {
+  let buf = thinkingBuffers.get(sessionId);
+  if (!buf) {
+    buf = new Map();
+    thinkingBuffers.set(sessionId, buf);
+  }
+  return buf;
+}
+
+// Fill empty thinking blocks with their streamed text, matched in block order.
+function mergeThinking(sessionId: string, content: unknown): unknown {
+  const buf = thinkingBuffers.get(sessionId);
+  if (!buf || buf.size === 0 || !Array.isArray(content)) return content;
+  const texts = [...buf.entries()].sort((a, b) => a[0] - b[0]).map(([, t]) => t);
+  let next = 0;
+  return content.map((block) => {
+    const b = block as { type?: string; thinking?: string };
+    if (b.type === "thinking" && !b.thinking && next < texts.length) {
+      return { ...b, thinking: texts[next++] };
+    }
+    return block;
+  });
 }
 
 function captureSdkId(sessionId: string, m: { session_id?: string }): void {
@@ -197,7 +231,11 @@ function handleMessage(sessionId: string, message: SDKMessage): void {
     session_id?: string;
     subtype?: string;
     message?: { content?: unknown };
-    event?: { type?: string; delta?: { type?: string; text?: string } };
+    event?: {
+      type?: string;
+      index?: number;
+      delta?: { type?: string; text?: string; thinking?: string };
+    };
     total_cost_usd?: number;
     num_turns?: number;
     duration_ms?: number;
@@ -214,7 +252,10 @@ function handleMessage(sessionId: string, message: SDKMessage): void {
     case "stream_event": {
       // Partial token delta — forward for live typing, do not persist.
       const ev = m.event;
-      if (ev?.type === "content_block_delta" && ev.delta) {
+      // A new assistant message starts a fresh thinking accumulator.
+      if (ev?.type === "message_start") {
+        thinkingBuffers.set(sessionId, new Map());
+      } else if (ev?.type === "content_block_delta" && ev.delta) {
         if (ev.delta.type === "text_delta" && typeof ev.delta.text === "string") {
           emitSession(sessionId, {
             type: "delta",
@@ -224,22 +265,28 @@ function handleMessage(sessionId: string, message: SDKMessage): void {
           });
         } else if (
           ev.delta.type === "thinking_delta" &&
-          typeof (ev.delta as { thinking?: string }).thinking === "string"
+          typeof ev.delta.thinking === "string"
         ) {
+          // Stash the streamed text so we can restore it on the final message.
+          if (typeof ev.index === "number") {
+            const buf = thinkingBuffer(sessionId);
+            buf.set(ev.index, (buf.get(ev.index) ?? "") + ev.delta.thinking);
+          }
           emitSession(sessionId, {
             type: "delta",
             sessionId,
             blockType: "thinking",
-            text: (ev.delta as { thinking?: string }).thinking!,
+            text: ev.delta.thinking,
           });
         }
       }
       return;
     }
     case "assistant": {
-      const content = m.message?.content ?? [];
+      const content = mergeThinking(sessionId, m.message?.content ?? []);
       const item = dbm.appendMessage(sessionId, "assistant", "assistant", content);
       emitSession(sessionId, { type: "message", sessionId, item });
+      thinkingBuffers.delete(sessionId);
       return;
     }
     case "user": {
