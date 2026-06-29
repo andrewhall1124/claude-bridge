@@ -25,13 +25,12 @@ async function request<T>(
   path: string,
   init?: RequestInit
 ): Promise<T> {
-  const res = await fetch(path, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
-    },
-  });
+  // Only declare a JSON content-type when we actually send a body. Sending it
+  // on a bodyless request (e.g. DELETE) makes Fastify reject the empty body
+  // with FST_ERR_CTP_EMPTY_JSON_BODY (400).
+  const headers: Record<string, string> = { ...(init?.headers as Record<string, string>) };
+  if (init?.body != null) headers["Content-Type"] = "application/json";
+  const res = await fetch(path, { ...init, headers });
   const text = await res.text();
   let body: unknown = undefined;
   if (text) {

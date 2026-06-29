@@ -27,6 +27,26 @@ function requireRepo(id: string) {
 export async function buildServer(): Promise<FastifyInstance> {
   const app = Fastify({ logger: false, bodyLimit: 8 * 1024 * 1024 });
 
+  // Tolerate an empty body on application/json requests (e.g. a DELETE that a
+  // client sends with a JSON content-type but no payload) instead of 400ing.
+  app.addContentTypeParser(
+    "application/json",
+    { parseAs: "string" },
+    (_req, body, done) => {
+      const text = typeof body === "string" ? body.trim() : "";
+      if (!text) {
+        done(null, undefined);
+        return;
+      }
+      try {
+        done(null, JSON.parse(text));
+      } catch (err) {
+        (err as { statusCode?: number }).statusCode = 400;
+        done(err as Error, undefined);
+      }
+    },
+  );
+
   // ---- REST API ----------------------------------------------------------
   app.get("/api/health", async () => ({ ok: true }));
 
