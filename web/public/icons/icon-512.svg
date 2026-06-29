@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Bridge">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#10131c"/>
-      <stop offset="1" stop-color="#0b0d12"/>
+      <stop offset="0" stop-color="#161616"/>
+      <stop offset="1" stop-color="#0a0a0a"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" fill="url(#bg)"/>
   <!-- simple suspension-bridge glyph within central safe zone -->
-  <g stroke="#4f8cff" stroke-width="14" fill="none" stroke-linecap="round">
+  <g stroke="#ff8c42" stroke-width="14" fill="none" stroke-linecap="round">
     <line x1="120" y1="160" x2="120" y2="360"/>
     <line x1="392" y1="160" x2="392" y2="360"/>
     <path d="M120 170 Q256 300 392 170"/>
@@ -17,5 +17,5 @@
     <line x1="292" y1="332" x2="274" y2="280"/>
     <line x1="342" y1="332" x2="312" y2="250"/>
   </g>
-  <text x="256" y="430" text-anchor="middle" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="84" font-weight="700" fill="#e8edf6">B</text>
+  <text x="256" y="430" text-anchor="middle" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="84" font-weight="700" fill="#ededed">B</text>
 </svg>

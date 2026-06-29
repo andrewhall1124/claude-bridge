@@ -1,17 +1,23 @@
 :root {
-  --bg: #0b0d12;
-  --bg-1: #10131c;
-  --bg-2: #161b27;
-  --bg-3: #1d2433;
-  --border: #232b3a;
-  --text: #e8edf6;
-  --text-dim: #9aa6bd;
-  --accent: #4f8cff;
-  --accent-dim: #2c4d8f;
-  --danger: #ff5d6c;
-  --ok: #36d399;
-  --warn: #f5b14a;
-  --radius: 10px;
+  /* Phosphor terminal — true black, amber-orange accent, hairline grey. */
+  --bg: #0a0a0a;
+  --bg-1: #121212;
+  --bg-2: #181818;
+  --bg-3: #222222;
+  --border: #2a2a2a;
+  --text: #ededed;
+  --text-dim: #8a8a8a;
+  --accent: #ff8c42;
+  --accent-2: #ffa766;
+  --accent-dim: #5a3a20;
+  --accent-bg: #1c1209;
+  --danger: #ff5555;
+  --ok: #ffb37a;
+  --warn: #e6a23c;
+  --on-accent: #140a02;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo,
+    Consolas, monospace;
+  --radius: 2px;
   --topbar-h: 52px;
   --bottom-h: 60px;
   --sidebar-w: 260px;
@@ -36,9 +42,8 @@ body,
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    sans-serif;
-  font-size: 14px;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
 }
@@ -66,7 +71,7 @@ select {
 textarea:focus,
 input:focus,
 select:focus {
-  border-color: var(--accent-dim);
+  border-color: var(--accent);
 }
 
 .subtle {
@@ -94,11 +99,11 @@ select:focus {
 .btn-primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: #061224;
+  color: var(--on-accent);
   font-weight: 600;
 }
 .btn-primary:hover {
-  background: #6aa0ff;
+  background: var(--accent-2);
 }
 .btn-danger {
   border-color: #5a2730;
@@ -146,7 +151,10 @@ select:focus {
 }
 .brand {
   font-weight: 700;
-  letter-spacing: 0.3px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-shadow: 0 0 8px rgba(255, 140, 66, 0.45);
 }
 .topbar-context {
   font-size: 13px;
@@ -172,23 +180,30 @@ select:focus {
   border: none;
   color: var(--text-dim);
   padding: 6px 12px;
-  border-radius: 7px;
+  border-radius: 2px;
   cursor: pointer;
+}
+.top-tab {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 12px;
 }
 .top-tab.active {
   background: var(--bg-3);
-  color: var(--text);
+  color: var(--accent);
+  box-shadow: inset 0 -2px 0 var(--accent);
 }
 
 .conn-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
   background: var(--text-dim);
   flex: 0 0 auto;
 }
 .conn-dot.connected {
-  background: var(--ok);
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
 }
 .conn-dot.connecting,
 .conn-dot.reconnecting {
@@ -327,7 +342,7 @@ select:focus {
   font-size: 14px;
   padding: 4px 6px;
   line-height: 1;
-  border-radius: 6px;
+  border-radius: 2px;
 }
 .icon-btn-sm:hover {
   background: var(--bg-2);
@@ -345,15 +360,15 @@ select:focus {
 .status-badge {
   font-size: 11px;
   padding: 2px 7px;
-  border-radius: 999px;
+  border-radius: 2px;
   background: var(--bg-3);
   color: var(--text-dim);
   text-transform: lowercase;
   flex: 0 0 auto;
 }
 .status-badge.running {
-  background: #14324a;
-  color: #67c0ff;
+  background: var(--accent-bg);
+  color: var(--accent-2);
 }
 .status-badge.idle,
 .status-badge.queued {
@@ -361,7 +376,7 @@ select:focus {
   color: var(--text-dim);
 }
 .status-badge.done {
-  background: #143524;
+  background: var(--accent-bg);
   color: var(--ok);
 }
 .status-badge.error {
@@ -382,7 +397,7 @@ select:focus {
   font-size: 11px;
   font-weight: 600;
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: 2px;
   background: var(--bg-3);
   color: var(--text-dim);
   flex: 0 0 auto;
@@ -393,11 +408,11 @@ select:focus {
   color: var(--text-dim);
 }
 .mode-badge.mode-acceptEdits {
-  background: #14324a;
-  color: #67c0ff;
+  background: var(--accent-bg);
+  color: var(--accent-2);
 }
 .mode-badge.mode-plan {
-  background: #1f2b1f;
+  background: var(--accent-bg);
   color: var(--ok);
 }
 .mode-badge.mode-bypassPermissions {
@@ -468,20 +483,21 @@ select:focus {
 .bubble {
   max-width: 85%;
   padding: 10px 12px;
-  border-radius: 14px;
+  border-radius: 2px;
   white-space: pre-wrap;
   word-break: break-word;
   line-height: 1.45;
 }
 .bubble.user {
-  background: var(--accent-dim);
-  color: #eaf1ff;
-  border-bottom-right-radius: 4px;
+  background: var(--accent-bg);
+  color: var(--text);
+  border: 1px solid var(--accent-dim);
+  border-right: 2px solid var(--accent);
 }
 .bubble.assistant {
   background: var(--bg-2);
   border: 1px solid var(--border);
-  border-bottom-left-radius: 4px;
+  border-bottom-left-radius: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -505,7 +521,7 @@ select:focus {
 .code-fence {
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 2px;
   padding: 10px;
   overflow-x: auto;
   margin: 4px 0;
@@ -535,7 +551,7 @@ select:focus {
 .tool-chip,
 .tool-result {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 2px;
   background: var(--bg-1);
   overflow: hidden;
 }
@@ -594,8 +610,8 @@ select:focus {
   align-self: flex-start;
   max-width: 85%;
   border: 1px solid var(--accent-dim);
-  background: #0f1626;
-  border-radius: 10px;
+  background: var(--accent-bg);
+  border-radius: 2px;
   padding: 8px 11px;
   display: flex;
   flex-direction: column;
@@ -604,7 +620,7 @@ select:focus {
 .answer-badge {
   font-size: 11px;
   font-weight: 600;
-  color: #67c0ff;
+  color: var(--accent-2);
 }
 
 .system-line {
@@ -658,7 +674,7 @@ select:focus {
 .approval-card {
   border: 1px solid var(--warn);
   background: #221c0f;
-  border-radius: 12px;
+  border-radius: 2px;
   padding: 12px;
   display: flex;
   flex-direction: column;
@@ -674,7 +690,7 @@ select:focus {
   background: var(--warn);
   color: #2a1d00;
   padding: 2px 7px;
-  border-radius: 999px;
+  border-radius: 2px;
   font-weight: 600;
 }
 .approval-tool {
@@ -685,7 +701,7 @@ select:focus {
   margin: 0;
   padding: 10px;
   background: var(--bg);
-  border-radius: 8px;
+  border-radius: 2px;
   overflow-x: auto;
   font-family: ui-monospace, monospace;
   font-size: 12px;
@@ -706,8 +722,8 @@ select:focus {
 /* ---------- question (AskUserQuestion) ---------- */
 .question-card {
   border: 1px solid var(--accent);
-  background: #0f1626;
-  border-radius: 12px;
+  background: var(--accent-bg);
+  border-radius: 2px;
   padding: 12px;
   display: flex;
   flex-direction: column;
@@ -721,9 +737,9 @@ select:focus {
 .question-badge {
   font-size: 11px;
   background: var(--accent);
-  color: #06122b;
+  color: var(--on-accent);
   padding: 2px 7px;
-  border-radius: 999px;
+  border-radius: 2px;
   font-weight: 600;
 }
 .question-block {
@@ -739,7 +755,7 @@ select:focus {
   color: var(--text-dim);
   background: var(--bg-3);
   padding: 1px 7px;
-  border-radius: 999px;
+  border-radius: 2px;
 }
 .question-text {
   margin: 0;
@@ -756,7 +772,7 @@ select:focus {
   gap: 2px;
   text-align: left;
   padding: 8px 10px;
-  border-radius: 8px;
+  border-radius: 2px;
   border: 1px solid var(--border);
   background: var(--bg-2);
   cursor: pointer;
@@ -767,7 +783,7 @@ select:focus {
 }
 .option.active {
   border-color: var(--accent);
-  background: #14233f;
+  background: var(--accent-bg);
 }
 .option:disabled {
   cursor: default;
@@ -784,7 +800,7 @@ select:focus {
   margin: 6px 0 0;
   padding: 8px;
   background: var(--bg);
-  border-radius: 6px;
+  border-radius: 2px;
   font-size: 12px;
   font-family: ui-monospace, monospace;
   white-space: pre-wrap;
@@ -819,7 +835,7 @@ select:focus {
   border: 1px solid transparent;
   color: var(--text-dim);
   padding: 6px 14px;
-  border-radius: 8px;
+  border-radius: 2px;
   cursor: pointer;
 }
 .subtab.active {
@@ -918,7 +934,7 @@ select:focus {
   gap: 10px;
   padding: 6px 8px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 2px;
   background: var(--bg-1);
 }
 .status-flags {
@@ -990,7 +1006,7 @@ select:focus {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 2px;
   padding: 8px 10px;
   background: var(--bg-1);
 }
@@ -1063,7 +1079,7 @@ select:focus {
   overflow: auto;
   background: var(--bg-1);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 2px;
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -1085,7 +1101,7 @@ select:focus {
 .modal-tab {
   flex: 1 1 0;
   padding: 7px 10px;
-  border-radius: 8px;
+  border-radius: 2px;
   border: 1px solid var(--border);
   background: var(--bg-2);
   color: var(--text);
@@ -1117,7 +1133,7 @@ select:focus {
   max-width: 92%;
   border: 1px solid var(--border);
   background: var(--bg-1);
-  border-radius: 9px;
+  border-radius: 2px;
   overflow: hidden;
 }
 .tool-node.error {
@@ -1193,7 +1209,7 @@ select:focus {
   margin: 0;
   padding: 8px 10px;
   background: var(--bg);
-  border-radius: 6px;
+  border-radius: 2px;
   font-family: ui-monospace, monospace;
   font-size: 12px;
   white-space: pre-wrap;
@@ -1219,7 +1235,7 @@ select:focus {
   text-align: left;
   background: transparent;
   border: 1px dashed var(--border);
-  border-radius: 9px;
+  border-radius: 2px;
   color: var(--text-dim);
   padding: 6px 10px;
   cursor: pointer;
@@ -1250,7 +1266,7 @@ select:focus {
   padding: 8px 10px;
   background: var(--bg-1);
   border: 1px dashed var(--border);
-  border-radius: 8px;
+  border-radius: 2px;
   color: var(--text-dim);
   font-size: 12.5px;
   white-space: pre-wrap;
@@ -1268,8 +1284,8 @@ select:focus {
   gap: 4px;
   padding: 8px 11px;
   border: 1px solid var(--accent-dim);
-  background: #0e1422;
-  border-radius: 9px;
+  background: var(--accent-bg);
+  border-radius: 2px;
 }
 .working-head {
   display: flex;
@@ -1277,7 +1293,7 @@ select:focus {
   gap: 8px;
 }
 .working-label {
-  color: #9cc2ff;
+  color: var(--accent-2);
   font-size: 13px;
   font-weight: 500;
 }
@@ -1316,7 +1332,7 @@ select:focus {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #9cc2ff;
+  background: var(--accent-2);
   opacity: 0.4;
   animation: dotpulse 1.2s infinite ease-in-out;
 }
@@ -1352,7 +1368,7 @@ select:focus {
   max-width: 92%;
   border: 1px solid var(--border);
   background: var(--bg-1);
-  border-radius: 9px;
+  border-radius: 2px;
   overflow: hidden;
 }
 .toolgroup.error {
@@ -1379,7 +1395,7 @@ select:focus {
   color: var(--text-dim);
   background: var(--bg-3);
   padding: 1px 7px;
-  border-radius: 999px;
+  border-radius: 2px;
 }
 .toolgroup-body {
   border-top: 1px solid var(--border);
@@ -1443,20 +1459,20 @@ select:focus {
   vertical-align: middle;
 }
 .md a {
-  color: #67c0ff;
+  color: var(--accent-2);
   text-decoration: underline;
 }
 .md code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.88em;
   background: var(--bg-3);
-  border-radius: 5px;
+  border-radius: 2px;
   padding: 1px 5px;
 }
 .md pre {
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 2px;
   padding: 10px 12px;
   margin: 8px 0;
   overflow-x: auto;

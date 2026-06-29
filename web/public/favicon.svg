@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 512 512" role="img" aria-label="Bridge">
-  <rect width="512" height="512" rx="96" fill="#0b0d12"/>
-  <g stroke="#4f8cff" stroke-width="20" fill="none" stroke-linecap="round">
+  <rect width="512" height="512" rx="0" fill="#0a0a0a"/>
+  <g stroke="#ff8c42" stroke-width="20" fill="none" stroke-linecap="round">
     <line x1="120" y1="150" x2="120" y2="370"/>
     <line x1="392" y1="150" x2="392" y2="370"/>
     <path d="M120 165 Q256 320 392 165"/>
     <line x1="92" y1="340" x2="420" y2="340"/>
   </g>
-  <text x="256" y="300" text-anchor="middle" font-family="system-ui, sans-serif" font-size="150" font-weight="700" fill="#e8edf6">B</text>
+  <text x="256" y="300" text-anchor="middle" font-family="system-ui, sans-serif" font-size="150" font-weight="700" fill="#ededed">B</text>
 </svg>
