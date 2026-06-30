@@ -201,6 +201,37 @@ function buildCanUseTool(sessionId: string, sess: () => ActiveSession | undefine
   };
 }
 
+// AskUserQuestion is surfaced to the owner only through `canUseTool` (the picker
+// is driven by the question_request it emits). But in bypassPermissions (and
+// other auto-accept) modes the SDK accepts tools without ever calling
+// canUseTool, so the question never reaches the UI and the call hangs forever on
+// "waiting for your answer". PreToolUse hooks run in *every* permission mode, so
+// we use one to force AskUserQuestion through the permission prompt — a
+// `permissionDecision: "ask"` makes the SDK invoke canUseTool even under bypass.
+function buildAskHooks(): Options["hooks"] {
+  return {
+    PreToolUse: [
+      {
+        matcher: ASK_TOOL,
+        hooks: [
+          async (input) => {
+            if (input.hook_event_name !== "PreToolUse" || input.tool_name !== ASK_TOOL) {
+              return {};
+            }
+            return {
+              hookSpecificOutput: {
+                hookEventName: "PreToolUse",
+                permissionDecision: "ask",
+                permissionDecisionReason: "Bridge asks the owner this question.",
+              },
+            };
+          },
+        ],
+      },
+    ],
+  };
+}
+
 // Consume the SDK message stream for a session: persist transcript items and
 // fan them out to subscribed clients.
 async function consume(sessionId: string, q: Query): Promise<void> {
@@ -387,6 +418,7 @@ function startSession(sessionId: string): ActiveSession {
     allowDangerouslySkipPermissions: true,
     includePartialMessages: true,
     canUseTool: buildCanUseTool(sessionId, getSelf),
+    hooks: buildAskHooks(),
     env: agentEnv(),
     systemPrompt: {
       type: "preset",
