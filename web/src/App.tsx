@@ -79,6 +79,9 @@ export function App() {
     const vv = window.visualViewport;
     if (!vv) return;
     const root = document.documentElement;
+    // The VisualViewport height already excludes the home-indicator inset, so
+    // chrome pinned to the shell's bottom edge (the footer) must not re-add it.
+    root.style.setProperty("--chrome-safe-bottom", "0px");
     const update = () => {
       root.style.setProperty("--app-height", `${vv.height}px`);
       // iOS may have scrolled the layout viewport to reveal the focused input;

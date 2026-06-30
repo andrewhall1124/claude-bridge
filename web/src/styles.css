@@ -1201,7 +1201,13 @@ select:focus {
   flex: 0 0 auto;
   border-top: 1px solid var(--border);
   background: var(--bg-1);
-  padding-bottom: var(--safe-bottom);
+  /* The footer is the bottom-most element inside `.app`. When the VisualViewport
+     governs the shell height (`--app-height`, set in App.tsx), the shell already
+     ends at the top of the home-indicator inset, so adding it here would reserve
+     that space twice — a dead band below the footer. `--chrome-safe-bottom` is
+     set to 0 by that same handler; it falls back to the real inset only when no
+     VisualViewport is driving the layout (shell at full-screen `100dvh`). */
+  padding-bottom: var(--chrome-safe-bottom, var(--safe-bottom));
 }
 .bottom-tab {
   flex: 1;
