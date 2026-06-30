@@ -71,19 +71,19 @@ export function App() {
   const wide = useMediaQuery("(min-width: 900px)");
   const stream = useSessionStream(selectedSessionId);
 
-  // Keep the app shell sized to the *visible* viewport. iOS leaves `dvh` at full
-  // height when the on-screen keyboard opens, which scrolls the chat input off
-  // the bottom of the screen. The VisualViewport reports the area not covered by
-  // the keyboard; mirror it into `--app-height` (consumed by `.app`).
+  // The app shell is pinned to the full screen (`.app` uses `inset: 0`). When the
+  // on-screen keyboard opens, iOS leaves the layout viewport (and `window.innerHeight`)
+  // full-size and only shrinks the VisualViewport, so the chat input would scroll
+  // off the bottom. Mirror the keyboard's height into `--kb`; `.app` lifts its
+  // bottom edge by that amount to sit above the keyboard, and stays full-screen
+  // (no `--kb`) at rest — so the footer always reaches the real screen bottom.
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
     const root = document.documentElement;
-    // The VisualViewport height already excludes the home-indicator inset, so
-    // chrome pinned to the shell's bottom edge (the footer) must not re-add it.
-    root.style.setProperty("--chrome-safe-bottom", "0px");
     const update = () => {
-      root.style.setProperty("--app-height", `${vv.height}px`);
+      const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      root.style.setProperty("--kb", `${kb}px`);
       // iOS may have scrolled the layout viewport to reveal the focused input;
       // undo it so the pinned shell stays aligned with the visible area.
       if (window.scrollY !== 0) window.scrollTo(0, 0);

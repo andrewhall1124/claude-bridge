@@ -135,16 +135,18 @@ select:focus {
 .app {
   display: flex;
   flex-direction: column;
-  /* Pin to the visible viewport. On iOS, `100dvh` stays full-height when the
-     on-screen keyboard opens, so the page scrolls and the chat input is shoved
-     off the bottom. `--app-height` is set from the VisualViewport API (see
-     App.tsx) so the shell shrinks to the area above the keyboard instead.
-     `position: fixed` removes the shell from flow so iOS has nothing to scroll. */
+  /* Pin to the full screen via `inset: 0` so the shell always reaches the real
+     bottom edge (and the footer sits flush above the home indicator). On iOS,
+     `100dvh`/the layout viewport stays full-height when the on-screen keyboard
+     opens, which would shove the chat input off the bottom; `--kb` (set from the
+     VisualViewport API in App.tsx) is the keyboard's height, so we lift the
+     shell's bottom edge by it to sit above the keyboard. `position: fixed`
+     removes the shell from flow so iOS has nothing to scroll. */
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: var(--app-height, 100dvh);
+  bottom: var(--kb, 0px);
 }
 
 .topbar {
@@ -1201,13 +1203,9 @@ select:focus {
   flex: 0 0 auto;
   border-top: 1px solid var(--border);
   background: var(--bg-1);
-  /* The footer is the bottom-most element inside `.app`. When the VisualViewport
-     governs the shell height (`--app-height`, set in App.tsx), the shell already
-     ends at the top of the home-indicator inset, so adding it here would reserve
-     that space twice — a dead band below the footer. `--chrome-safe-bottom` is
-     set to 0 by that same handler; it falls back to the real inset only when no
-     VisualViewport is driving the layout (shell at full-screen `100dvh`). */
-  padding-bottom: var(--chrome-safe-bottom, var(--safe-bottom));
+  /* The shell now reaches the real screen bottom (`.app` uses `inset: 0`), so the
+     footer must inset itself above the home indicator. */
+  padding-bottom: var(--safe-bottom);
 }
 .bottom-tab {
   flex: 1;
