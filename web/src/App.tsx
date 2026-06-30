@@ -81,8 +81,15 @@ export function App() {
     const vv = window.visualViewport;
     if (!vv) return;
     const root = document.documentElement;
+    // The keyboard's height is the amount the VisualViewport has shrunk below its
+    // resting (keyboard-closed) height. `window.innerHeight` is unreliable here —
+    // iOS reports it toolbar-hidden, larger than the actual fixed viewport, which
+    // would fake a ~200px keyboard at rest. Track the largest height seen instead;
+    // the viewport only drops below it when the keyboard (or similar) appears.
+    let baseline = vv.height;
     const update = () => {
-      const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      if (vv.height > baseline) baseline = vv.height;
+      const kb = Math.max(0, baseline - vv.height);
       root.style.setProperty("--kb", `${kb}px`);
       // iOS may have scrolled the layout viewport to reveal the focused input;
       // undo it so the pinned shell stays aligned with the visible area.
