@@ -655,13 +655,24 @@ select:focus {
 /* ---------- chat input ---------- */
 .chat-input {
   border-top: 1px solid var(--border);
-  padding: 10px calc(10px + var(--safe-right)) calc(10px + var(--safe-bottom))
+  /* No `--safe-bottom` here: on mobile the composer is always followed by the
+     `.bottom-tabs` footer (which carries the safe area) or covered by the
+     keyboard, so adding it leaves a dead gap below the input. It's restored
+     below only on wide screens, where no footer renders and the composer does
+     sit at the bottom edge. */
+  padding: 10px calc(10px + var(--safe-right)) 10px
     calc(10px + var(--safe-left));
   background: var(--bg-1);
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* Wide screens render no bottom-tabs footer, so the composer is the bottom-most
+   element and must clear the home-indicator safe area itself. */
+.app:not(:has(.bottom-tabs)) .chat-input {
+  padding-bottom: calc(10px + var(--safe-bottom));
 }
 
 /* Mode selector sits in its own row above the composer. On desktop it keeps
