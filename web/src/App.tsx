@@ -153,9 +153,16 @@ export function App() {
 
   function selectRepo(id: string) {
     setSelectedRepoId(id);
-    setSelectedSessionId(null);
-    // Keep the drawer open on mobile so repo -> session is one fluid step;
-    // picking a session (or creating one) is what closes it.
+    // Open the repo's most recent session in chat. Sessions come back sorted
+    // by last activity (newest first), so the first match is the top one.
+    const topSession = sessions.find((s) => s.repoId === id) ?? null;
+    setSelectedSessionId(topSession?.id ?? null);
+    if (topSession) {
+      setSidebarOpen(false);
+      setTab("chat");
+    }
+    // No sessions yet: keep the drawer open on mobile so repo -> new session is
+    // one fluid step; creating a session is what closes it.
   }
 
   function onRepoAdded(repo: Repo) {
