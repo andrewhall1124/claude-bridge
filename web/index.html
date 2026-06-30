@@ -18,10 +18,12 @@
     <!-- iOS PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
+    <!-- `black` (opaque), not `black-translucent`: translucent makes iOS render
+         the web view full-bleed from the top while keeping the viewport height
+         a status-bar shorter, stranding that height as an uncovered strip at the
+         bottom (a gap below the footer). Opaque places the web view below the
+         status bar so the shell reaches the real screen bottom. -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="apple-mobile-web-app-title" content="Bridge" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   </head>
