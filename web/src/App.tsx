@@ -86,7 +86,14 @@ export function App() {
     // constant when the keyboard opens). 0 at rest, so the shell fills the screen;
     // positive while typing, so `.app` lifts its bottom edge above the keyboard.
     const update = () => {
-      const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      // Keyboard height is purely the viewport *shrink*. Do NOT subtract
+      // `vv.offsetTop`: when iOS reveals the focused input it sometimes nudges
+      // the VisualViewport down (offsetTop > 0), and subtracting that here
+      // cancels the lift exactly when the keyboard is up — leaving `--kb` at 0
+      // so the composer stays hidden behind the keyboard. The shell is
+      // `position: fixed` (anchored to the layout viewport), so a visual-viewport
+      // offset doesn't move it; only the shrink matters.
+      const kb = Math.max(0, window.innerHeight - vv.height);
       root.style.setProperty("--kb", `${kb}px`);
       // iOS may have scrolled the layout viewport to reveal the focused input;
       // undo it so the pinned shell stays aligned with the visible area.
