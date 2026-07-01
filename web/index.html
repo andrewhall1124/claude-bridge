@@ -22,12 +22,12 @@
     <meta name="theme-color" content="#121212" />
     <meta name="color-scheme" content="dark" />
 
-    <!-- iOS PWA. No `apple-mobile-web-app-status-bar-style`: in the non-cover model
-         above, iOS keeps the web view inside the safe area and tints the status bar
-         from `theme-color`, so there's no iOS-drawn bar to fight and nothing to
-         strand at the bottom. (Setting a style here re-opts into owning the notch.) -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="mobile-web-app-capable" content="yes" />
+    <!-- iOS PWA via the web manifest only (display: standalone), like forma. We
+         deliberately do NOT set `apple-mobile-web-app-capable` / `mobile-web-app-capable`:
+         that legacy "apple standalone" mode ignores `theme-color` and tints the status
+         bar from `apple-mobile-web-app-status-bar-style` (black by default) — which is
+         what kept the notch black. Manifest-only standalone lets iOS tint the notch and
+         home-indicator strips from `theme-color` (#121212), matching the header/footer. -->
     <meta name="apple-mobile-web-app-title" content="Bridge" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   </head>
