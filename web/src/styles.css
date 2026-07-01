@@ -146,10 +146,14 @@ select:focus {
      shell's bottom edge by it to sit above the keyboard. `position: fixed`
      removes the shell from flow so iOS has nothing to scroll. */
   position: fixed;
-  top: 0;
+  /* Track the VisualViewport: `--vvt` (its `offsetTop`) insets the top so the
+     shell follows iOS's on-focus scroll into the visible region, and
+     `--kb` - `--vvt` keeps the bottom pinned to the keyboard top. Both 0 at rest
+     → the shell fills the screen. */
+  top: var(--vvt, 0px);
   left: 0;
   right: 0;
-  bottom: var(--kb, 0px);
+  bottom: calc(var(--kb, 0px) - var(--vvt, 0px));
   /* Repaint the interior with the content black; `body` stays chrome grey so the
      iOS-painted notch / home-indicator strips match the header and bottom tabs. */
   background: var(--bg);
