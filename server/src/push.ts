@@ -83,8 +83,9 @@ export function notifySessionStatus(
     default:
       return; // running / anything else: no notification
   }
+  const repoName = dbm.getRepo(session.repoId)?.name ?? session.repoId;
   void sendToAll({
-    title,
+    title: `${title} — ${repoName}`,
     body: session.title,
     url: `/chat/${encodeURIComponent(session.repoId)}/${encodeURIComponent(session.id)}`,
     tag: session.id,
