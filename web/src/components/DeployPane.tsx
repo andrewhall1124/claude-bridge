@@ -4,6 +4,7 @@ import type {
   RailwayConfig,
   RailwayProject,
   RailwayStatus,
+  RailwayWorkspace,
   Repo,
 } from "../protocol";
 
@@ -52,6 +53,9 @@ interface Props {
 
 export function DeployPane({ repoId, repos, onReposChanged }: Props) {
   const [config, setConfig] = useState<RailwayConfig | null>(null);
+  const [workspaces, setWorkspaces] = useState<RailwayWorkspace[] | null>(null);
+  const [wsScoped, setWsScoped] = useState(false);
+  const [workspace, setWorkspace] = useState("");
   const [projects, setProjects] = useState<RailwayProject[]>([]);
   const [status, setStatus] = useState<RailwayStatus | null>(null);
   const [env, setEnv] = useState<string | null>(null);
@@ -93,14 +97,32 @@ export function DeployPane({ repoId, repos, onReposChanged }: Props) {
     setEnv(config?.environment ?? null);
   }, [repoId, config?.environment]);
 
-  // Fetch the project list (for the link picker) when needed.
+  // Fetch the workspace list (for the link picker) when needed.
   useEffect(() => {
-    if (!config?.configured || !needPicker || projects.length > 0) return;
+    if (!config?.configured || !needPicker || workspaces !== null) return;
     api
-      .getRailwayProjects()
-      .then((r) => setProjects(r.projects))
+      .getRailwayWorkspaces()
+      .then((r) => {
+        setWorkspaces(r.workspaces);
+        setWsScoped(r.scoped);
+        setWorkspace((prev) => prev || r.workspaces[0]?.id || "");
+      })
       .catch((e) => setError(errMsg(e)));
-  }, [config?.configured, needPicker, projects.length]);
+  }, [config?.configured, needPicker, workspaces]);
+
+  // Fetch the selected workspace's projects for the link picker.
+  useEffect(() => {
+    if (!config?.configured || !needPicker || !workspace) return;
+    let alive = true;
+    setProjects([]);
+    api
+      .getRailwayProjects(workspace)
+      .then((r) => alive && setProjects(r.projects))
+      .catch((e) => alive && setError(errMsg(e)));
+    return () => {
+      alive = false;
+    };
+  }, [config?.configured, needPicker, workspace]);
 
   const loadStatus = useCallback(async () => {
     if (!config?.configured || !linkedProject || relinking) return;
@@ -179,17 +201,39 @@ export function DeployPane({ repoId, repos, onReposChanged }: Props) {
         </p>
         {error && <div className="system-line error">{error}</div>}
         <div className="deploy-link-row">
-          <select
-            value={pick || linkedProject || ""}
-            onChange={(e) => setPick(e.target.value)}
-          >
-            <option value="">Select a project…</option>
-            {projects.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
+          <label className="deploy-field">
+            <span className="subtle">Workspace</span>
+            <select
+              value={workspace}
+              onChange={(e) => {
+                setWorkspace(e.target.value);
+                setPick("");
+              }}
+            >
+              {workspaces === null && <option value="">Loading…</option>}
+              {(workspaces ?? []).map((w) => (
+                <option key={w.id} value={w.id}>
+                  {w.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div className="deploy-link-row">
+          <label className="deploy-field">
+            <span className="subtle">Project</span>
+            <select
+              value={pick || linkedProject || ""}
+              onChange={(e) => setPick(e.target.value)}
+            >
+              <option value="">Select a project…</option>
+              {projects.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </label>
           <button
             className="btn btn-sm btn-primary"
             onClick={() => void link()}
@@ -203,8 +247,16 @@ export function DeployPane({ repoId, repos, onReposChanged }: Props) {
             </button>
           )}
         </div>
-        {projects.length === 0 && !error && (
+        {workspace && projects.length === 0 && !error && (
           <p className="subtle">Loading projects…</p>
+        )}
+        {wsScoped && (
+          <p className="subtle">
+            This Railway token only sees one workspace. To pick projects from
+            other workspaces (e.g. a team), create an account token without
+            selecting a workspace at railway.com/account/tokens and update it
+            in Settings → Railway.
+          </p>
         )}
       </div>
     );

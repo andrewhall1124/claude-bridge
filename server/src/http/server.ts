@@ -414,15 +414,28 @@ export async function buildServer(): Promise<FastifyInstance> {
     },
   );
 
-  app.get("/api/railway/projects", async (_req, reply) => {
+  app.get("/api/railway/workspaces", async (_req, reply) => {
     const { token } = resolvedRailway();
     if (!token) return reply.code(400).send({ error: "Railway is not configured" });
     try {
-      return { projects: await railway.listProjects(token) };
+      return await railway.listWorkspaces(token);
     } catch (err) {
       return reply.code(502).send({ error: errMsg(err) });
     }
   });
+
+  app.get<{ Querystring: { workspace?: string } }>(
+    "/api/railway/projects",
+    async (req, reply) => {
+      const { token } = resolvedRailway();
+      if (!token) return reply.code(400).send({ error: "Railway is not configured" });
+      try {
+        return { projects: await railway.listProjects(token, req.query.workspace) };
+      } catch (err) {
+        return reply.code(502).send({ error: errMsg(err) });
+      }
+    },
+  );
 
   app.get<{ Querystring: { project?: string; env?: string } }>(
     "/api/railway/status",

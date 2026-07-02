@@ -11,6 +11,7 @@ import type {
   RailwayConfig,
   RailwayProject,
   RailwayStatus,
+  RailwayWorkspaceList,
   ReferencesResult,
   Repo,
   SessionMeta,
@@ -183,8 +184,14 @@ export const api = {
       method: "PUT",
       body: JSON.stringify(patch),
     }),
-  getRailwayProjects: () =>
-    request<{ projects: RailwayProject[] }>("/api/railway/projects"),
+  getRailwayWorkspaces: () =>
+    request<RailwayWorkspaceList>("/api/railway/workspaces"),
+  getRailwayProjects: (workspace?: string) =>
+    request<{ projects: RailwayProject[] }>(
+      `/api/railway/projects${
+        workspace ? `?workspace=${encodeURIComponent(workspace)}` : ""
+      }`,
+    ),
   getRailwayStatus: (project?: string, env?: string) => {
     const qs = new URLSearchParams();
     if (project) qs.set("project", project);

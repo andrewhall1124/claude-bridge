@@ -193,6 +193,18 @@ export interface RailwayProject {
   name: string;
 }
 
+export interface RailwayWorkspace {
+  id: string;
+  name: string;
+}
+
+export interface RailwayWorkspaceList {
+  workspaces: RailwayWorkspace[];
+  /** True when the token can only see a single workspace (workspace-scoped
+   *  token); account tokens can enumerate all of the user's workspaces. */
+  scoped: boolean;
+}
+
 export interface RailwayEnvironment {
   id: string;
   name: string;

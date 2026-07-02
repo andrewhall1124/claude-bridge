@@ -8,6 +8,18 @@ export interface RailwayProject {
   name: string;
 }
 
+export interface RailwayWorkspace {
+  id: string;
+  name: string;
+}
+
+export interface RailwayWorkspaceList {
+  workspaces: RailwayWorkspace[];
+  /** True when the token can only see a single workspace (workspace-scoped
+   *  token); account tokens can enumerate all of the user's workspaces. */
+  scoped: boolean;
+}
+
 export interface RailwayEnvironment {
   id: string;
   name: string;
@@ -78,12 +90,47 @@ type Edges<T> = { edges: { node: T }[] };
 const nodes = <T>(e: Edges<T> | null | undefined): T[] =>
   (e?.edges ?? []).map((x) => x.node);
 
-export async function listProjects(token: string): Promise<RailwayProject[]> {
+export async function listProjects(
+  token: string,
+  workspaceId?: string | null,
+): Promise<RailwayProject[]> {
   const data = await gql<{ projects: Edges<RailwayProject> }>(
     token,
-    `query { projects { edges { node { id name } } } }`,
+    `query projects($workspaceId: String) {
+       projects(workspaceId: $workspaceId) { edges { node { id name } } }
+     }`,
+    workspaceId?.trim() ? { workspaceId: workspaceId.trim() } : {},
   );
   return nodes(data.projects);
+}
+
+// Workspaces visible to the token. Account tokens enumerate them via `me`;
+// workspace-scoped tokens get "Not Authorized" there, so fall back to
+// deriving the (single) visible workspace from the projects list.
+export async function listWorkspaces(
+  token: string,
+): Promise<RailwayWorkspaceList> {
+  try {
+    const data = await gql<{ me: { workspaces: RailwayWorkspace[] } }>(
+      token,
+      `query { me { workspaces { id name } } }`,
+    );
+    return {
+      workspaces: data.me.workspaces.map((w) => ({ id: w.id, name: w.name })),
+      scoped: false,
+    };
+  } catch (err) {
+    if (!(err instanceof RailwayError && /not authorized/i.test(err.message)))
+      throw err;
+  }
+  const data = await gql<{
+    projects: Edges<{ workspace: RailwayWorkspace | null }>;
+  }>(token, `query { projects { edges { node { workspace { id name } } } } }`);
+  const seen = new Map<string, RailwayWorkspace>();
+  for (const p of nodes(data.projects)) {
+    if (p.workspace) seen.set(p.workspace.id, p.workspace);
+  }
+  return { workspaces: [...seen.values()], scoped: true };
 }
 
 // Railway deployment meta is a free-form JSON blob; git deploys carry commit
